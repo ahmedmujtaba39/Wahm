@@ -1,0 +1,11 @@
+ex_id,qid,question_type,gulf_arabic_question
+ex_01,wahm_015,how many / number,بين كم وكم بيضة تحط أنثى السلمندر؟
+ex_02,wahm_008,when / date,متى انكتبت وثيقة إعلان قيام دولة إسرائيل؟
+ex_03,wahm_003,where / place,وين موجود مسجد السلطان عبد المجيد؟
+ex_04,wahm_001,who / person,من اللي اكتشف المرو أو الكوارتز؟
+ex_05,wahm_011,what is / definition,وش يعني الطيف الكهرومغناطيسي؟
+ex_06,wahm_026,how many / measurement,كم يوصل أقصى عمق لبحر قزوين؟
+ex_07,wahm_024,when / year,متى صارت بطولة غرب آسيا لكرة القدم أول مرة؟
+ex_08,wahm_014,where / place,وين انولد صدام حسين؟
+ex_09,wahm_133,which / entity,وش العضو اللي ينقل الأكسجين في الجسم؟
+ex_10,wahm_000,how many / count,كم مرة فازت الأوروغواي بكأس العالم لكرة القدم؟
