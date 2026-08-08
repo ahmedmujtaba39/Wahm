@@ -1,0 +1,247 @@
+"""
+WAHM stage 4: answer generation.
+
+Runs the model set over the benchmark and records raw answers. Every row is
+identified by (qid, variety, condition, model), so MSA, the four dialects, and
+the control condition are all just rows: no separate code paths.
+
+Reads   wahm_seed_msa.csv        the MSA arm
+        final_<dialect>.csv      validated dialect arms (from finalize.py)
+Writes  generations.csv          append-only, resumable
+
+Design notes
+  * Zero-shot, no retrieved context: answers must come from parametric
+    knowledge, which is the regime where hallucination shows up.
+  * temperature 0.0 by default: we want the model's most likely answer, and
+    reproducibility.
+  * Raw output is stored unmodified. Cleaning and degeneration detection happen
+    at scoring time, not here, so the record stays auditable.
+  * Resumable: re-running skips (qid, variety, condition, model) already done.
+
+Conditions
+  direct      the question is asked as-is, model answers however it wants
+  msa_answer  dialect question, but the model is told to answer in MSA.
+              This is the control for the matching confound: if a dialect
+              answer scores as hallucinated only because it lexically diverges
+              from the MSA gold, this condition removes that artifact. If the
+              drift survives here, it is real.
+
+Usage
+    python generate.py --models gpt4o allam --varieties msa gulf
+    python generate.py --all --limit 20              # pilot
+    python generate.py --all                         # full run
+"""
+
+import argparse, csv, os, sys, time
+from datetime import datetime, timezone
+
+# ---------------------------------------------------------------- model registry
+# All entries speak the OpenAI chat-completions schema. If Fanar or ALLaM turn
+# out not to, only `call_openai_compatible` needs a sibling function; the rest
+# of the script is provider-agnostic.
+MODELS = {
+    "gpt4o": dict(
+        model_id="gpt-4o",
+        base_url=None,                      # default OpenAI
+        key_env="OPENAI_API_KEY",
+        family="multilingual",
+    ),
+    "allam": dict(
+        model_id=os.getenv("ALLAM_DEPLOYMENT", "allam-2-7b"),
+        base_url_env="AZURE_ALLAM_ENDPOINT",  # Azure AI Foundry endpoint
+        key_env="AZURE_ALLAM_KEY",
+        family="arabic_centric",
+    ),
+    "fanar": dict(
+        model_id=os.getenv("FANAR_MODEL", "Fanar"),
+        base_url_env="FANAR_BASE_URL",        # from your approved QCRI API access
+        key_env="FANAR_API_KEY",
+        family="arabic_centric",
+    ),
+    "falcon": dict(
+        model_id="tiiuae/falcon-h1-34b-instruct",
+        base_url="https://openrouter.ai/api/v1",
+        key_env="OPENROUTER_API_KEY",
+        family="arabic_centric",
+    ),
+    "llama": dict(
+        model_id="meta-llama/llama-3.3-70b-instruct",
+        base_url="https://openrouter.ai/api/v1",
+        key_env="OPENROUTER_API_KEY",
+        family="multilingual",
+    ),
+}
+
+VARIETIES = ["msa", "gulf", "egyptian", "levantine", "sudanese"]
+
+MSA_ANSWER_SYSTEM = (
+    "أجب على السؤال التالي باللغة العربية الفصحى الحديثة فقط، "
+    "بغض النظر عن اللهجة المستخدمة في السؤال."
+)
+
+OUT = "generations.csv"
+FIELDS = ["qid", "variety", "condition", "model", "family", "question",
+          "gold_answer", "answer", "model_id", "temperature", "timestamp", "error"]
+
+
+# ---------------------------------------------------------------- clients
+_clients = {}
+
+
+def get_client(name):
+    """One OpenAI-compatible client per model, cached."""
+    if name in _clients:
+        return _clients[name]
+    from openai import OpenAI
+    spec = MODELS[name]
+
+    key = os.getenv(spec["key_env"])
+    if not key:
+        sys.exit(f"ERROR: {name} needs {spec['key_env']} in the environment")
+
+    base = spec.get("base_url")
+    if base is None and "base_url_env" in spec:
+        base = os.getenv(spec["base_url_env"])
+        if not base:
+            sys.exit(f"ERROR: {name} needs {spec['base_url_env']} in the environment")
+
+    _clients[name] = OpenAI(api_key=key, base_url=base) if base else OpenAI(api_key=key)
+    return _clients[name]
+
+
+def generate_one(name, question, condition, temperature, max_tokens=512, retries=4):
+    spec = MODELS[name]
+    client = get_client(name)
+
+    msgs = []
+    if condition == "msa_answer":
+        msgs.append({"role": "system", "content": MSA_ANSWER_SYSTEM})
+    msgs.append({"role": "user", "content": question})
+
+    for attempt in range(retries):
+        try:
+            r = client.chat.completions.create(
+                model=spec["model_id"], messages=msgs,
+                temperature=temperature, max_tokens=max_tokens)
+            return (r.choices[0].message.content or "").strip(), ""
+        except Exception as e:
+            if attempt == retries - 1:
+                return "", f"{type(e).__name__}: {e}"[:300]
+            time.sleep(2 ** attempt)
+
+
+# ---------------------------------------------------------------- benchmark loading
+def load_benchmark(varieties, limit=None):
+    """Returns rows of (qid, variety, question, gold)."""
+    items = []
+
+    if "msa" in varieties:
+        path = "wahm_seed_msa.csv"
+        if not os.path.exists(path):
+            sys.exit(f"ERROR: {path} not found")
+        for r in csv.DictReader(open(path, encoding="utf-8")):
+            items.append((r["qid"], "msa", r["question_msa"], r["gold_answer"]))
+
+    for v in varieties:
+        if v == "msa":
+            continue
+        path = f"final_{v}.csv"
+        if not os.path.exists(path):
+            print(f"  skipping {v}: {path} not found "
+                  "(run finalize.py once the validator returns their sheet)")
+            continue
+        for r in csv.DictReader(open(path, encoding="utf-8")):
+            items.append((r["qid"], v, r["question_dialect"], r["gold_answer"]))
+
+    if limit:
+        # keep the limit per variety so arms stay parallel
+        by_variety = {}
+        for it in items:
+            by_variety.setdefault(it[1], []).append(it)
+        items = [it for v in by_variety for it in by_variety[v][:limit]]
+
+    return items
+
+
+def load_done():
+    """Resume support: which (qid, variety, condition, model) already succeeded."""
+    if not os.path.exists(OUT):
+        return set()
+    done = set()
+    for r in csv.DictReader(open(OUT, encoding="utf-8")):
+        if r.get("answer", "").strip() and not r.get("error", "").strip():
+            done.add((r["qid"], r["variety"], r["condition"], r["model"]))
+    return done
+
+
+# ---------------------------------------------------------------- main loop
+def run(models, varieties, conditions, limit, temperature, sleep):
+    items = load_benchmark(varieties, limit)
+    if not items:
+        sys.exit("ERROR: no benchmark items loaded")
+
+    done = load_done()
+    todo = [(q, v, ques, gold, c, m)
+            for (q, v, ques, gold) in items
+            for c in conditions
+            for m in models
+            if (q, v, c, m) not in done
+            and not (c == "msa_answer" and v == "msa")]   # control is dialect-only
+
+    print(f"benchmark items : {len(items)}")
+    print(f"models          : {', '.join(models)}")
+    print(f"varieties       : {', '.join(varieties)}")
+    print(f"conditions      : {', '.join(conditions)}")
+    print(f"already done    : {len(done)}")
+    print(f"to generate     : {len(todo)}\n")
+    if not todo:
+        print("nothing to do")
+        return
+
+    new_file = not os.path.exists(OUT)
+    with open(OUT, "a", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=FIELDS)
+        if new_file:
+            w.writeheader()
+
+        errors = 0
+        for i, (qid, variety, question, gold, condition, model) in enumerate(todo, 1):
+            answer, err = generate_one(model, question, condition, temperature)
+            if err:
+                errors += 1
+            w.writerow(dict(
+                qid=qid, variety=variety, condition=condition, model=model,
+                family=MODELS[model]["family"], question=question,
+                gold_answer=gold, answer=answer,
+                model_id=MODELS[model]["model_id"], temperature=temperature,
+                timestamp=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                error=err))
+            f.flush()
+
+            if i % 25 == 0 or i == len(todo):
+                print(f"  {i}/{len(todo)}  (errors: {errors})")
+            if sleep:
+                time.sleep(sleep)
+
+    print(f"\nwrote {OUT}")
+    if errors:
+        print(f"{errors} rows failed — re-run this command to retry only those")
+
+
+if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument("--models", nargs="+", default=None, choices=list(MODELS))
+    p.add_argument("--varieties", nargs="+", default=None, choices=VARIETIES)
+    p.add_argument("--conditions", nargs="+", default=["direct"],
+                   choices=["direct", "msa_answer"])
+    p.add_argument("--all", action="store_true", help="all models, all varieties")
+    p.add_argument("--limit", type=int, default=None,
+                   help="first N questions per variety (use 20 for a pilot)")
+    p.add_argument("--temperature", type=float, default=0.0)
+    p.add_argument("--sleep", type=float, default=0.0, help="pause between calls")
+    a = p.parse_args()
+
+    models = list(MODELS) if a.all else (a.models or ["gpt4o"])
+    varieties = VARIETIES if a.all else (a.varieties or ["msa"])
+
+    run(models, varieties, a.conditions, a.limit, a.temperature, a.sleep)
