@@ -14,6 +14,9 @@ The stages are separated deliberately:
    trains on question-disjoint partitions, calibrates the threshold on
    validation, evaluates the untouched test partition, and writes the model and
    `judge_metadata.json` to the PVC.
+4. `report-job.yaml` reads the saved metadata and copies a compact, checksummed
+   metric summary into the pod termination message. This remains available from
+   the Kubernetes API even when a node's live log endpoint is unavailable.
 
 Do not submit from an uncommitted or unpushed tree. Both Jobs contain
 `__WAHM_GIT_COMMIT__`; replace it with the exact pushed commit.
@@ -41,6 +44,15 @@ kubectl -n aiea-interns wait --for=condition=complete `
 kubectl -n aiea-interns logs -f job/wahm-judge-train
 kubectl -n aiea-interns wait --for=condition=complete `
   job/wahm-judge-train --timeout=24h
+
+(Get-Content infra/nautilus/report-job.yaml -Raw).Replace(
+  '__WAHM_GIT_COMMIT__', $commit
+) | kubectl apply -f -
+
+kubectl -n aiea-interns wait --for=condition=complete `
+  job/wahm-judge-report --timeout=30m
+kubectl -n aiea-interns get pod -l job-name=wahm-judge-report `
+  -o jsonpath='{.items[0].status.containerStatuses[0].state.terminated.message}'
 ```
 
 To retrieve the final model, start a temporary pod mounting

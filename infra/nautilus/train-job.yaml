@@ -106,6 +106,29 @@ spec:
                 --epochs 3 \
                 --batch-size 8 \
                 --gradient-accumulation 2
+              python - <<'PY' > /dev/termination-log
+              import hashlib
+              import json
+              import os
+              from pathlib import Path
+              metadata_path = (Path("/workspace/results/wahm-judge") /
+                               os.environ["WAHM_GIT_COMMIT"] /
+                               "arabert-gold-answer/judge_metadata.json")
+              raw = metadata_path.read_bytes()
+              metadata = json.loads(raw)
+              print(json.dumps({
+                  "metadata_sha256": hashlib.sha256(raw).hexdigest(),
+                  "base_model": metadata["base_model"],
+                  "base_model_revision": metadata["base_model_revision"],
+                  "decision_threshold": metadata["decision_threshold"],
+                  "validation_metrics": metadata["validation_metrics"],
+                  "test_metrics": metadata["test_metrics"],
+                  "n_train": metadata["n_train"],
+                  "n_validation": metadata["n_validation"],
+                  "n_test": metadata["n_test"],
+                  "versions": metadata["versions"],
+              }, sort_keys=True))
+              PY
           env:
             - name: WAHM_GIT_COMMIT
               value: __WAHM_GIT_COMMIT__

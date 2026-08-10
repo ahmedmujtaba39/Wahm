@@ -71,9 +71,11 @@ Run the answer-only ablation separately:
 python train_judge.py --answer-only --output arabert_judge_answer_only
 ```
 
-The current local environment passed an end-to-end tiny-model smoke test. Its
-tiny-model metrics are not research results. Full AraBERT training has not been
-run in this checkout because the installed PyTorch build is CPU-only.
+The local environment passed an end-to-end tiny-model smoke test. Its metrics
+are not research results. Full pinned AraBERT training completed on NRP
+Nautilus from commit `384174ac90cab0f9cd132c010a651dcbb83b2aac`; its durable
+model and metadata are on the WAHM PVC. Research metrics must be copied here
+from the saved `judge_metadata.json` before being cited.
 
 ## Combined scoring
 
