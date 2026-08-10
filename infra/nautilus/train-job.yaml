@@ -65,6 +65,10 @@ spec:
               apt-get install -y --no-install-recommends git ca-certificates
               rm -rf /var/lib/apt/lists/*
               repo="/workspace/repos/wahm-${WAHM_GIT_COMMIT}"
+              if [[ ! -d "${repo}/.git" ]]; then
+                git clone "${WAHM_GIT_REPOSITORY}" "${repo}"
+              fi
+              git -C "${repo}" fetch origin
               git -C "${repo}" checkout --detach "${WAHM_GIT_COMMIT}"
               python -m pip install --no-cache-dir -r "${repo}/requirements-judge.txt"
               python "${repo}/scripts/verify_hf_snapshot.py" \
@@ -105,6 +109,8 @@ spec:
           env:
             - name: WAHM_GIT_COMMIT
               value: __WAHM_GIT_COMMIT__
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/cyberuniversal/Wahm.git
             - name: WAHM_JUDGE_MODEL
               value: aubmindlab/bert-base-arabertv2
             - name: WAHM_JUDGE_REVISION
