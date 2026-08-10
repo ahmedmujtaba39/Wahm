@@ -13,6 +13,7 @@ import evaluate_layer3
 import prepare_layer3
 import score_layer1
 import translate
+from train_judge import _model_load_kwargs
 from judge_data import (grouped_split, grouped_train_validation_test_split,
                         load_judge_rows)
 from wahm_text import normalize_arabic, token_f1
@@ -221,6 +222,17 @@ class JudgeSplitTests(unittest.TestCase):
             model_file.write_bytes(b"tampered")
             with self.assertRaises(ValueError):
                 verify_hf_snapshot(audit_path, "model", "commit")
+
+
+class ModelLoadingTests(unittest.TestCase):
+    def test_local_snapshot_does_not_forward_hub_revision(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertEqual(_model_load_kwargs(directory, "commit"), {})
+
+    def test_hub_model_forwards_pinned_revision(self):
+        self.assertEqual(
+            _model_load_kwargs("organization/model", "commit"),
+            {"revision": "commit"})
 
 
 class AnalysisTests(unittest.TestCase):

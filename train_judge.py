@@ -7,6 +7,10 @@ from pathlib import Path
 from judge_data import grouped_train_validation_test_split, load_judge_rows
 
 
+def _model_load_kwargs(model_name, model_revision):
+    return {} if Path(model_name).is_dir() else {"revision": model_revision}
+
+
 def _probabilities(logits, np):
     shifted = logits - logits.max(axis=1, keepdims=True)
     exponentials = np.exp(shifted)
@@ -34,7 +38,7 @@ def _select_threshold(labels, probabilities, np, f1_score):
 def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         use_gold=True, batch_size=2, gradient_accumulation=8,
         model_name="aubmindlab/bert-base-arabertv2", model_revision=None,
-        smoke_groups=None):
+        smoke_groups=None, model_source_id=None):
     import datasets
     import numpy as np
     import torch
@@ -62,8 +66,8 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         train_indices = limit_groups(train_indices)
         validation_indices = limit_groups(validation_indices)
         test_indices = limit_groups(test_indices)
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name, revision=model_revision)
+    load_kwargs = _model_load_kwargs(model_name, model_revision)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, **load_kwargs)
 
     def make_dataset(indices):
         data = {
@@ -84,7 +88,7 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
     validation_dataset = make_dataset(validation_indices)
     test_dataset = make_dataset(test_indices)
     model = AutoModelForSequenceClassification.from_pretrained(
-        model_name, revision=model_revision, num_labels=2)
+        model_name, num_labels=2, **load_kwargs)
 
     def trainer_metrics(output):
         probabilities = _probabilities(output.predictions, np)
@@ -133,7 +137,8 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
                       key=lambda value: int(value))
 
     metadata = {
-        "base_model": model_name,
+        "base_model": model_source_id or model_name,
+        "base_model_load_path": model_name,
         "base_model_revision": model_revision,
         "smoke_test": smoke_groups is not None,
         "input": "gold_answer + answer" if use_gold else "answer only",
@@ -183,6 +188,8 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="aubmindlab/bert-base-arabertv2")
     parser.add_argument("--model-revision", default=None,
                         help="immutable Hugging Face commit for the base model")
+    parser.add_argument("--model-source-id", default=None,
+                        help="canonical model ID when --model is a local snapshot")
     parser.add_argument("--smoke-groups", type=int, default=None,
                         help="limit each partition to N question groups for plumbing tests")
     parser.add_argument("--answer-only", action="store_true")
@@ -190,4 +197,4 @@ if __name__ == "__main__":
     run(args.data, args.output, args.test_fold, args.validation_fold,
         args.epochs, not args.answer_only, args.batch_size,
         args.gradient_accumulation, args.model, args.model_revision,
-        args.smoke_groups)
+        args.smoke_groups, args.model_source_id)

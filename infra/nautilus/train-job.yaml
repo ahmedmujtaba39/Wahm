@@ -71,6 +71,18 @@ spec:
                 --audit /workspace/artifacts/wahm-arabert-cache-audit.json \
                 --model-id "${WAHM_JUDGE_MODEL}" \
                 --revision "${WAHM_JUDGE_REVISION}"
+              model_snapshot=$(python - <<'PY'
+              import json
+              from pathlib import Path
+              audit = json.loads(Path(
+                  "/workspace/artifacts/wahm-arabert-cache-audit.json"
+              ).read_text(encoding="utf-8"))
+              snapshot = Path(audit["snapshot_dir"])
+              if not snapshot.is_dir():
+                  raise SystemExit(f"cached model snapshot is missing: {snapshot}")
+              print(snapshot)
+              PY
+              )
               python - <<'PY'
               import torch
               if not torch.cuda.is_available():
@@ -81,7 +93,8 @@ spec:
               mkdir -p "${output}"
               cd "${repo}"
               python train_judge.py \
-                --model "${WAHM_JUDGE_MODEL}" \
+                --model "${model_snapshot}" \
+                --model-source-id "${WAHM_JUDGE_MODEL}" \
                 --model-revision "${WAHM_JUDGE_REVISION}" \
                 --output "${output}" \
                 --test-fold 0 \
