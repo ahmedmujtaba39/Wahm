@@ -21,10 +21,34 @@ spec:
         app.kubernetes.io/name: wahm
         wahm/stage: layer2-variants
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: v100-cc-star-01.noc.ucsb.edu
       restartPolicy: Never
       terminationGracePeriodSeconds: 120
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - v100-cc-star-01.noc.ucsb.edu
+                  - key: nvidia.com/gpu.product
+                    operator: In
+                    values:
+                      - NVIDIA-GeForce-RTX-3090
+                      - NVIDIA-GeForce-RTX-4090
+                      - NVIDIA-A10
+                      - NVIDIA-L4
+                      - NVIDIA-L40
+                      - NVIDIA-L40S
+                      - NVIDIA-RTX-A5000
+                      - NVIDIA-RTX-5000-Ada-Generation
+                      - NVIDIA-TITAN-RTX
+                      - Quadro-RTX-6000
+                      - Tesla-T4
+                      - Tesla-V100-SXM2-32GB
+                      - Tesla-V100-SXM2-16GB
+                      - Tesla-V100-PCIE-16GB
       containers:
         - name: train
           image: pytorch/pytorch:2.7.1-cuda11.8-cudnn9-runtime
@@ -32,21 +56,14 @@ spec:
           args:
             - |
               set -euo pipefail
-              apt-get update
-              apt-get install -y --no-install-recommends git ca-certificates
-              rm -rf /var/lib/apt/lists/*
               repo="/workspace/repos/wahm-${WAHM_GIT_COMMIT}"
-              if [[ ! -d "${repo}/.git" ]]; then
-                git clone "${WAHM_GIT_REPOSITORY}" "${repo}"
-              fi
-              git -C "${repo}" fetch origin
-              git -C "${repo}" checkout --detach "${WAHM_GIT_COMMIT}"
-              python -m pip install --no-cache-dir -r "${repo}/requirements-judge.txt"
-              python "${repo}/scripts/verify_hf_snapshot.py" \
+              [[ "$(cat /workspace/prepared-commit.txt)" == "${WAHM_GIT_COMMIT}" ]]
+              python_bin=/workspace/venv/bin/python
+              "${python_bin}" "${repo}/scripts/verify_hf_snapshot.py" \
                 --audit /workspace/artifacts/wahm-arabert-cache-audit.json \
                 --model-id "${WAHM_JUDGE_MODEL}" \
                 --revision "${WAHM_JUDGE_REVISION}"
-              model_snapshot=$(python - <<'PY'
+              model_snapshot=$("${python_bin}" - <<'PY'
               import json
               from pathlib import Path
               audit = json.loads(Path(
@@ -55,7 +72,7 @@ spec:
               print(audit["snapshot_dir"])
               PY
               )
-              python - <<'PY'
+              "${python_bin}" - <<'PY'
               import torch
               if not torch.cuda.is_available():
                   raise SystemExit("CUDA is unavailable inside the training pod")
@@ -64,7 +81,7 @@ spec:
               output="/workspace/results/wahm-layer2/${WAHM_GIT_COMMIT}"
               mkdir -p "${output}"
               cd "${repo}"
-              python train_layer2_variants.py \
+              "${python_bin}" train_layer2_variants.py \
                 --data judge_train.csv \
                 --model "${model_snapshot}" \
                 --model-source-id "${WAHM_JUDGE_MODEL}" \
@@ -74,7 +91,7 @@ spec:
                 --batch-size 8 \
                 --eval-batch-size 32 \
                 2>&1 | tee "${output}/training.log"
-              python - <<'PY' > /dev/termination-log
+              "${python_bin}" - <<'PY' > /dev/termination-log
               import json
               import os
               from pathlib import Path
@@ -117,4 +134,4 @@ spec:
       volumes:
         - name: workspace
           persistentVolumeClaim:
-            claimName: wahm-judge-recovery-539948
+            claimName: wahm-layer2-final-539948

@@ -1,0 +1,76 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-layer2-prepare
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: layer2-prepare
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: layer2-prepare
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: prepare
+          image: pytorch/pytorch:2.7.1-cuda11.8-cudnn9-runtime
+          command: ["/bin/bash", "-lc"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update
+              apt-get install -y --no-install-recommends git ca-certificates
+              rm -rf /var/lib/apt/lists/*
+              repo="/workspace/repos/wahm-${WAHM_GIT_COMMIT}"
+              git clone "${WAHM_GIT_REPOSITORY}" "${repo}"
+              git -C "${repo}" checkout --detach "${WAHM_GIT_COMMIT}"
+              python -m venv --system-site-packages /workspace/venv
+              /workspace/venv/bin/python -m pip install --no-cache-dir \
+                -r "${repo}/requirements-judge.txt"
+              /workspace/venv/bin/python "${repo}/scripts/cache_hf_snapshot.py" \
+                --model-id "${WAHM_JUDGE_MODEL}" \
+                --revision "${WAHM_JUDGE_REVISION}" \
+                --cache-dir /workspace/hf-cache \
+                --output /workspace/artifacts/wahm-arabert-cache-audit.json
+              /workspace/venv/bin/python - <<'PY'
+              import accelerate, datasets, sklearn, torch, transformers
+              print({
+                  "accelerate": accelerate.__version__,
+                  "datasets": datasets.__version__,
+                  "sklearn": sklearn.__version__,
+                  "torch": torch.__version__,
+                  "transformers": transformers.__version__,
+              })
+              PY
+              printf '%s' "${WAHM_GIT_COMMIT}" > /workspace/prepared-commit.txt
+          env:
+            - name: WAHM_GIT_COMMIT
+              value: __WAHM_GIT_COMMIT__
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/cyberuniversal/Wahm.git
+            - name: WAHM_JUDGE_MODEL
+              value: aubmindlab/bert-base-arabertv2
+            - name: WAHM_JUDGE_REVISION
+              value: 97522efce17efa33036ac619802d5cec238dcad9
+            - name: HF_HOME
+              value: /workspace/hf-cache
+            - name: HF_HUB_DISABLE_XET
+              value: "1"
+          resources:
+            requests:
+              cpu: "4"
+              memory: 16Gi
+            limits:
+              cpu: "4"
+              memory: 16Gi
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: wahm-layer2-final-539948
