@@ -1,5 +1,5 @@
 {
-  "data": "Judge_train.csv.csv",
+  "data": "judge_train.csv",
   "n_rows": 4195,
   "split": "StratifiedGroupKFold grouped by sample_index",
   "folds": [

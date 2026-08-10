@@ -21,17 +21,35 @@ def valid_labels(row):
 
 
 def binary_label(row):
-    return int(any(row.get(column, "").strip() == "1"
-                   for column in LABEL_COLUMNS))
+    has_type_columns = any(column in row for column in LABEL_COLUMNS)
+    derived = int(any(row.get(column, "").strip() == "1"
+                      for column in LABEL_COLUMNS))
+    supplied = row.get("hallucinated", "").strip()
+    if not supplied:
+        return derived
+    if supplied not in {"0", "1"}:
+        raise ValueError(f"invalid binary hallucinated label: {supplied!r}")
+    label = int(supplied)
+    if has_type_columns and label != derived:
+        raise ValueError("binary hallucinated label disagrees with type columns")
+    return label
 
 
-def load_judge_rows(path="Judge_train.csv.csv"):
-    # utf-8-sig removes the BOM present before sample_index in the source CSV.
+def load_judge_rows(path="judge_train.csv"):
+    # utf-8-sig also supports the BOM in the unprocessed source CSV.
     with open(path, encoding="utf-8-sig", newline="") as source:
         rows = [row for row in csv.DictReader(source)
                 if row.get("answer", "").strip() and valid_labels(row)]
+    question_groups = {}
     for row in rows:
         row["label"] = binary_label(row)
+        if not row.get("sample_index", "").strip():
+            question = row.get("question", "").strip()
+            if not question:
+                raise ValueError("judge row is missing both sample_index and question")
+            if question not in question_groups:
+                question_groups[question] = str(len(question_groups))
+            row["sample_index"] = question_groups[question]
     return rows
 
 

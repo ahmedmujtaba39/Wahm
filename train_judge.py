@@ -178,7 +178,7 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="Judge_train.csv.csv")
+    parser.add_argument("--data", default="judge_train.csv")
     parser.add_argument("--output", default="arabert_judge_gold_answer")
     parser.add_argument("--test-fold", type=int, default=0)
     parser.add_argument("--validation-fold", type=int, default=0)

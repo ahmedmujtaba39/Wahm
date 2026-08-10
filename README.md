@@ -21,13 +21,14 @@ valid result and means it decreased.
 | Dialect translations | Not generated/validated | Translation, QC, and finalization scripts only |
 | Model generations | Not run | `generate.py` |
 | Layer 1 | Implemented; source-label evaluation saved | `score_layer1.py`, `results/layer1_arahallueval.json` |
-| Layer 2 | Full AraBERT training completed on Nautilus; metric retrieval pending | `train_judge.py`, `score_layer2.py`, `infra/nautilus/` |
+| Layer 2 | Binary training data validated; clean AraBERT rerun pending | `judge_train.csv`, `train_judge.py`, `score_layer2.py`, `infra/nautilus/` |
 | Layer 3 human validation | Blinded preparation/evaluation implemented | `prepare_layer3.py`, `evaluate_layer3.py` |
 
 The earlier extensionless `layer 1` file is a failed AraBERT environment
 notebook, not a working Layer 1 implementation. Its row-random split would put
 answers to the same question into train and test sets. The new judge scripts
-split by `sample_index` (question), preventing that leakage. Consequently, the
+split by question (the processed file's deterministic replacement for raw
+`sample_index`), preventing that leakage. Consequently, the
 previously stated TF-IDF 75% accuracy/0.82 AUC must not be used. The verified
 five-fold question-grouped result is **57.9% mean accuracy and 0.578 mean AUC**;
 it is saved in `results/tfidf_grouped_cv.json`.

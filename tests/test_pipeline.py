@@ -10,6 +10,7 @@ import finalize
 import generate
 import analyze_results
 import evaluate_layer3
+import judge_data
 import prepare_layer3
 import score_layer1
 import translate
@@ -183,21 +184,36 @@ class FinalizationTests(unittest.TestCase):
 
 
 class JudgeSplitTests(unittest.TestCase):
+    def test_binary_training_file_is_consistent(self):
+        rows = load_judge_rows(ROOT / "judge_train.csv")
+        self.assertEqual(len(rows), 4195)
+        self.assertEqual(sum(row["label"] for row in rows), 2347)
+        self.assertEqual(len({row["sample_index"] for row in rows}), 300)
+
     def test_question_groups_do_not_leak(self):
-        rows = load_judge_rows(ROOT / "Judge_train.csv.csv")
+        rows = load_judge_rows(ROOT / "judge_train.csv")
         train, test = grouped_split(rows)
         train_groups = {rows[i]["sample_index"] for i in train}
         test_groups = {rows[i]["sample_index"] for i in test}
         self.assertTrue(train_groups.isdisjoint(test_groups))
 
     def test_train_validation_test_groups_are_disjoint(self):
-        rows = load_judge_rows(ROOT / "Judge_train.csv.csv")
+        rows = load_judge_rows(ROOT / "judge_train.csv")
         partitions = grouped_train_validation_test_split(rows)
         groups = [{rows[i]["sample_index"] for i in partition}
                   for partition in partitions]
         self.assertTrue(groups[0].isdisjoint(groups[1]))
         self.assertTrue(groups[0].isdisjoint(groups[2]))
         self.assertTrue(groups[1].isdisjoint(groups[2]))
+
+    def test_binary_label_mismatch_is_rejected(self):
+        row = {column: "0" for column in judge_data.LABEL_COLUMNS}
+        row["hallucinated"] = "1"
+        with self.assertRaises(ValueError):
+            judge_data.binary_label(row)
+
+    def test_compact_binary_only_row_is_supported(self):
+        self.assertEqual(judge_data.binary_label({"hallucinated": "1"}), 1)
 
     def test_snapshot_audit_detects_modified_file(self):
         with tempfile.TemporaryDirectory() as directory:

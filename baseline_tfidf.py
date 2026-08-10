@@ -47,7 +47,7 @@ def evaluate_fold(rows, fold=0):
     }
 
 
-def run(path="Judge_train.csv.csv", fold=None,
+def run(path="judge_train.csv", fold=None,
         output="results/tfidf_grouped_cv.json"):
     rows = load_judge_rows(path)
     folds = range(5) if fold is None else [fold]
@@ -79,7 +79,7 @@ def run(path="Judge_train.csv.csv", fold=None,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="Judge_train.csv.csv")
+    parser.add_argument("--data", default="judge_train.csv")
     parser.add_argument("--fold", type=int, default=None,
                         help="evaluate one fold; default evaluates all five")
     parser.add_argument("--output", default="results/tfidf_grouped_cv.json")

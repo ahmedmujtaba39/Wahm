@@ -97,6 +97,7 @@ spec:
               mkdir -p "${output}"
               cd "${repo}"
               python train_judge.py \
+                --data judge_train.csv \
                 --model "${model_snapshot}" \
                 --model-source-id "${WAHM_JUDGE_MODEL}" \
                 --model-revision "${WAHM_JUDGE_REVISION}" \

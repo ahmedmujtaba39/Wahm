@@ -9,7 +9,7 @@ from judge_data import load_judge_rows
 from score_layer1 import score_answer
 
 
-def run(data="Judge_train.csv.csv", output="results/layer1_arahallueval.json",
+def run(data="judge_train.csv", output="results/layer1_arahallueval.json",
         clean_threshold=0.9):
     rows = load_judge_rows(data)
     decisions = []
@@ -54,7 +54,7 @@ def run(data="Judge_train.csv.csv", output="results/layer1_arahallueval.json",
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="Judge_train.csv.csv")
+    parser.add_argument("--data", default="judge_train.csv")
     parser.add_argument("--output", default="results/layer1_arahallueval.json")
     parser.add_argument("--clean-threshold", type=float, default=0.9)
     args = parser.parse_args()

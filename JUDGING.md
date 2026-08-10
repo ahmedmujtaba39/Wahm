@@ -6,9 +6,10 @@ evaluation.
 
 ## Source labels
 
-`Judge_train.csv.csv` contains 4,200 AraHalluEval answers: 300 questions with
-14 model answers each. Five answers are empty, leaving 4,195 usable examples.
-The nine binary type columns are collapsed to one label:
+`Judge_train.csv.csv` is the 4,200-row raw AraHalluEval source. The training
+input is the validated `judge_train.csv`: five empty answers are removed,
+leaving 4,195 examples from 300 questions. Its `hallucinated` column is the
+binary training target; the nine source type columns remain only for auditing:
 
 - `clean = 0` when every type is zero;
 - `hallucinated = 1` when any type is one.
@@ -36,7 +37,9 @@ source labels, not dialect generalization.
 
 ## Layer 2 development split
 
-All answers for one `sample_index` remain in the same partition. With seed 42,
+The processed file omits the raw `sample_index`, so the loader deterministically
+reconstructs it from the 300 unique question strings. All answers for one
+question remain in the same partition. With seed 42,
 test fold 0, and validation fold 0:
 
 | Partition | Questions | Answers | Hallucinated rate |
@@ -72,10 +75,10 @@ python train_judge.py --answer-only --output arabert_judge_answer_only
 ```
 
 The local environment passed an end-to-end tiny-model smoke test. Its metrics
-are not research results. Full pinned AraBERT training completed on NRP
-Nautilus from commit `384174ac90cab0f9cd132c010a651dcbb83b2aac`; its durable
-model and metadata are on the WAHM PVC. Research metrics must be copied here
-from the saved `judge_metadata.json` before being cited.
+are not research results. An earlier full run used the raw-source filename and
+is not accepted as the final Layer 2 artifact after the binary training schema
+was formalized. The next NRP Nautilus run must use `judge_train.csv`; only its
+saved `judge_metadata.json` may be cited.
 
 ## Combined scoring
 

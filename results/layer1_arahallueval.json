@@ -1,5 +1,5 @@
 {
-  "data": "Judge_train.csv.csv",
+  "data": "judge_train.csv",
   "n_valid_human_labels": 4195,
   "clean_threshold": 0.9,
   "n_resolved": 2580,
