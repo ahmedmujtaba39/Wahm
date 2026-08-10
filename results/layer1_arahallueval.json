@@ -1,0 +1,22 @@
+{
+  "data": "Judge_train.csv.csv",
+  "n_valid_human_labels": 4195,
+  "clean_threshold": 0.9,
+  "n_resolved": 2580,
+  "resolution_rate": 0.615018,
+  "accuracy_on_resolved": 0.818217,
+  "n_deferred": 1615,
+  "confusion": {
+    "true_clean_pred_clean": 733,
+    "true_clean_pred_hallucinated": 316,
+    "true_hallucinated_pred_clean": 153,
+    "true_hallucinated_pred_hallucinated": 1378
+  },
+  "degeneration_flags": {
+    "role_marker": 99,
+    "foreign_script": 108,
+    "code_fence": 64,
+    "heavy_repetition": 1
+  },
+  "note": "This evaluates against the source labels, including their known inconsistency on degenerate outputs."
+}

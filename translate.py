@@ -16,10 +16,13 @@ Usage
 """
 
 import argparse, csv, os, sys, time
-from openai import OpenAI
 
-MODEL = "gpt-4o"
+MODEL = os.getenv("WAHM_TRANSLATION_MODEL", "gpt-4o")
 SEED = "wahm_seed_msa.csv"
+OUTPUT_FIELDS = ["qid", "question_msa", "gold_answer", "dialect_candidate",
+                 "backtranslation_msa", "sub_variety", "requested_model",
+                 "translation_model", "backtranslation_model", "n_exemplars",
+                 "coda", "temperature"]
 
 DIALECT_NAMES = {
     "gulf": "Gulf (Khaleeji) Arabic",
@@ -28,7 +31,7 @@ DIALECT_NAMES = {
     "sudanese": "Sudanese Arabic",
 }
 
-client = OpenAI()
+_client = None
 
 CODA_RULE = ("4. Follow CODA orthography: spell dialect words like their MSA "
              "cognates where a cognate exists, write dialect-only words "
@@ -56,7 +59,12 @@ BACKTRANS_SYSTEM = ("You translate {dialect} questions into Modern Standard "
 def load_exemplars(dialect):
     path = f"exemplars_{dialect}.csv"
     pairs, subvariety = [], ""
-    with open(path, encoding="utf-8") as f:
+    try:
+        f = open(path, encoding="utf-8", newline="")
+    except FileNotFoundError:
+        sys.exit(f"ERROR: {path} not found. Complete the native-speaker "
+                 "exemplar template before making API calls.")
+    with f:
         for r in csv.DictReader(f):
             msa = r["msa_question"].strip()
             dia = r.get("dialect_question", "").strip()
@@ -89,13 +97,18 @@ def build_messages(system, pairs, question):
     return msgs
 
 
-def call(msgs, temperature, retries=3):
+def call(msgs, temperature, model=MODEL, retries=3):
+    global _client
+    if _client is None:
+        from openai import OpenAI
+        _client = OpenAI()
     for attempt in range(retries):
         try:
-            r = client.chat.completions.create(
-                model=MODEL, messages=msgs,
+            r = _client.chat.completions.create(
+                model=model, messages=msgs,
                 temperature=temperature, max_tokens=300)
-            return r.choices[0].message.content.strip()
+            return (r.choices[0].message.content.strip(),
+                    getattr(r, "model", model))
         except Exception as e:
             if attempt == retries - 1:
                 raise
@@ -105,7 +118,7 @@ def call(msgs, temperature, retries=3):
 
 
 def translate(dialect, limit=None, use_coda=True, temperature=0.3,
-              backtranslate=True, suffix=""):
+              backtranslate=True, suffix="", model=MODEL, overwrite=False):
     name = DIALECT_NAMES[dialect]
     pairs, subvariety = load_exemplars(dialect)
     system = build_system(name, subvariety, use_coda)
@@ -115,31 +128,59 @@ def translate(dialect, limit=None, use_coda=True, temperature=0.3,
     print(f"  sub-variety : {subvariety or 'UNSPECIFIED (ask your validator)'}")
     print(f"  CODA rule   : {'on' if use_coda else 'off'}")
     print(f"  temperature : {temperature}")
+    print(f"  model       : {model}")
 
-    seed = list(csv.DictReader(open(SEED, encoding="utf-8")))
+    with open(SEED, encoding="utf-8", newline="") as source:
+        seed = list(csv.DictReader(source))
     if limit:
         seed = seed[:limit]
 
     out = f"candidates_{dialect}{suffix}.csv"
-    with open(out, "w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["qid", "question_msa", "gold_answer", "dialect_candidate",
-                    "backtranslation_msa", "sub_variety", "model",
-                    "n_exemplars", "coda", "temperature"])
-        for i, r in enumerate(seed, 1):
+    done = set()
+    if os.path.exists(out) and not overwrite:
+        with open(out, encoding="utf-8", newline="") as existing:
+            reader = csv.DictReader(existing)
+            if reader.fieldnames != OUTPUT_FIELDS:
+                sys.exit(f"ERROR: {out} has an incompatible header. Use a new "
+                         "--suffix or explicitly pass --overwrite.")
+            existing_rows = list(reader)
+        incompatible = [r["qid"] for r in existing_rows
+                        if r["requested_model"] != model
+                        or r["sub_variety"] != subvariety
+                        or r["coda"] != str(int(use_coda))
+                        or float(r["temperature"]) != temperature]
+        if incompatible:
+            sys.exit(f"ERROR: {out} contains a different experiment setup "
+                     f"({len(incompatible)} incompatible rows). Use --suffix.")
+        done = {r["qid"] for r in existing_rows
+                if r["dialect_candidate"].strip()}
+
+    todo = [row for row in seed if row["qid"] not in done]
+    mode = "w" if overwrite or not os.path.exists(out) else "a"
+    with open(out, mode, encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=OUTPUT_FIELDS)
+        if mode == "w":
+            w.writeheader()
+        for i, r in enumerate(todo, 1):
             q = r["question_msa"].strip()
-            dia = call(build_messages(system, pairs, q), temperature)
-            back = ""
+            dia, translation_model = call(
+                build_messages(system, pairs, q), temperature, model)
+            back, backtranslation_model = "", ""
             if backtranslate:
-                back = call([
+                back, backtranslation_model = call([
                     {"role": "system",
                      "content": BACKTRANS_SYSTEM.format(dialect=name)},
-                    {"role": "user", "content": dia}], 0.0)
-            w.writerow([r["qid"], q, r["gold_answer"], dia, back, subvariety,
-                        MODEL, len(pairs), int(use_coda), temperature])
+                    {"role": "user", "content": dia}], 0.0, model)
+            w.writerow(dict(qid=r["qid"], question_msa=q,
+                            gold_answer=r["gold_answer"], dialect_candidate=dia,
+                            backtranslation_msa=back, sub_variety=subvariety,
+                            requested_model=model, translation_model=translation_model,
+                            backtranslation_model=backtranslation_model,
+                            n_exemplars=len(pairs), coda=int(use_coda),
+                            temperature=temperature))
             f.flush()
-            if i % 10 == 0 or i == len(seed):
-                print(f"  {i}/{len(seed)}")
+            if i % 10 == 0 or i == len(todo):
+                print(f"  {i}/{len(todo)} new ({len(done)} already complete)")
 
     print(f"\nwrote {out}\nnext: python qc.py {dialect}")
 
@@ -153,10 +194,14 @@ if __name__ == "__main__":
     p.add_argument("--temperature", type=float, default=0.3)
     p.add_argument("--no-backtranslate", action="store_true")
     p.add_argument("--suffix", default="", help="tag output file, e.g. _nocoda")
+    p.add_argument("--model", default=MODEL,
+                   help="translation model ID; record a pinned ID when available")
+    p.add_argument("--overwrite", action="store_true",
+                   help="replace an existing matching output instead of resuming")
     a = p.parse_args()
 
     if not os.getenv("OPENAI_API_KEY"):
         sys.exit("ERROR: set OPENAI_API_KEY")
 
     translate(a.dialect, a.limit, not a.no_coda, a.temperature,
-              not a.no_backtranslate, a.suffix)
+              not a.no_backtranslate, a.suffix, a.model, a.overwrite)
