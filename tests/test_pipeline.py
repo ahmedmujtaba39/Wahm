@@ -15,6 +15,7 @@ import prepare_layer3
 import score_layer1
 import translate
 from train_judge import _model_load_kwargs
+from train_layer2_variants import stratified_row_split
 from judge_data import (grouped_split, grouped_train_validation_test_split,
                         load_judge_rows)
 from wahm_text import normalize_arabic, token_f1
@@ -214,6 +215,14 @@ class JudgeSplitTests(unittest.TestCase):
 
     def test_compact_binary_only_row_is_supported(self):
         self.assertEqual(judge_data.binary_label({"hallucinated": "1"}), 1)
+
+    def test_specified_row_split_is_seeded_stratified_80_20(self):
+        rows = load_judge_rows(ROOT / "judge_train.csv")
+        train, test = stratified_row_split(rows)
+        self.assertEqual((len(train), len(test)), (3356, 839))
+        self.assertEqual(sum(rows[i]["label"] for i in train), 1878)
+        self.assertEqual(sum(rows[i]["label"] for i in test), 469)
+        self.assertEqual([train, test], stratified_row_split(rows))
 
     def test_snapshot_audit_detects_modified_file(self):
         with tempfile.TemporaryDirectory() as directory:
