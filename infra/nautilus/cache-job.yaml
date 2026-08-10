@@ -28,7 +28,7 @@ spec:
               rm -rf /var/lib/apt/lists/*
               repo="/workspace/repos/wahm-${WAHM_GIT_COMMIT}"
               if [[ ! -d "${repo}/.git" ]]; then
-                git clone https://github.com/ahmedmujtaba39/Wahm.git "${repo}"
+                git clone "${WAHM_GIT_REPOSITORY}" "${repo}"
               fi
               git -C "${repo}" fetch origin
               git -C "${repo}" checkout --detach "${WAHM_GIT_COMMIT}"
@@ -41,6 +41,8 @@ spec:
           env:
             - name: WAHM_GIT_COMMIT
               value: __WAHM_GIT_COMMIT__
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/cyberuniversal/Wahm.git
             - name: WAHM_JUDGE_MODEL
               value: aubmindlab/bert-base-arabertv2
             - name: WAHM_JUDGE_REVISION

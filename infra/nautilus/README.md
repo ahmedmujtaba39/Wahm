@@ -17,6 +17,9 @@ The stages are separated deliberately:
 
 Do not submit from an uncommitted or unpushed tree. Both Jobs contain
 `__WAHM_GIT_COMMIT__`; replace it with the exact pushed commit.
+The cache job reads the reviewed branch from the public
+`cyberuniversal/Wahm` fork because the authenticated account cannot push
+directly to `ahmedmujtaba39/Wahm`.
 
 ```powershell
 kubectl config use-context nautilus
