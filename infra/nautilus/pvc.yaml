@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wahm-judge-539948
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: judge
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: rook-ceph-block

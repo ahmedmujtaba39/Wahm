@@ -1,0 +1,7 @@
+{
+  "answer_only_auc": 0.8314844695441711,
+  "gold_answer_auc": 0.9319397222382296,
+  "tfidf_baseline_auc_from_specification": 0.82,
+  "winner": "gold_answer",
+  "winner_path": "/workspace/results/wahm-layer2/c234f9c79a394f1d415314217c93af1326f41e48/arabert_judge_gold_answer"
+}

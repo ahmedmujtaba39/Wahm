@@ -1,0 +1,55 @@
+{
+  "variant": "gold_answer",
+  "use_gold": true,
+  "data": "judge_train.csv",
+  "base_model": "aubmindlab/bert-base-arabertv2",
+  "base_model_load_path": "/workspace/hf-cache/models--aubmindlab--bert-base-arabertv2/snapshots/97522efce17efa33036ac619802d5cec238dcad9",
+  "base_model_revision": "97522efce17efa33036ac619802d5cec238dcad9",
+  "epochs": 3,
+  "train_batch_size": 8,
+  "eval_batch_size": 32,
+  "learning_rate": 2e-05,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "class_weight": "balanced",
+  "class_weights": [
+    1.13531799729364,
+    0.8935037273695421
+  ],
+  "accuracy": 0.8605482717520858,
+  "f1_hallucinated": 0.8790072388831437,
+  "roc_auc": 0.9319397222382296,
+  "classification_report": {
+    "clean": {
+      "precision": 0.8709677419354839,
+      "recall": 0.8027027027027027,
+      "f1-score": 0.8354430379746836,
+      "support": 370.0
+    },
+    "hallucinated": {
+      "precision": 0.8534136546184738,
+      "recall": 0.906183368869936,
+      "f1-score": 0.8790072388831437,
+      "support": 469.0
+    },
+    "accuracy": 0.8605482717520858,
+    "macro avg": {
+      "precision": 0.8621906982769789,
+      "recall": 0.8544430357863193,
+      "f1-score": 0.8572251384289136,
+      "support": 839.0
+    },
+    "weighted avg": {
+      "precision": 0.8611550280479062,
+      "recall": 0.8605482717520858,
+      "f1-score": 0.8597953743585547,
+      "support": 839.0
+    }
+  },
+  "versions": {
+    "torch": "2.7.1+cu118",
+    "transformers": "4.46.3",
+    "datasets": "3.6.0",
+    "scikit_learn": "1.9.0"
+  }
+}

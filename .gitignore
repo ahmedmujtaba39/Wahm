@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+candidates_*.csv
+validation_*.csv
+final_*.csv
+metrics_*.json
+generations.csv
+scores_layer1.csv
+scores_combined.csv
+arabert_judge_*/
+layer3/
+_smoke_judge/
+artifacts/

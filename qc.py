@@ -12,32 +12,10 @@ Usage:
     python qc.py gulf
 """
 
-import argparse, csv, re, unicodedata
+import argparse, csv, re
 from difflib import SequenceMatcher
 
-# ---- reuse the same normalization as Layer 1 so scores are comparable ----
-_DIAC = re.compile(r"[\u064B-\u065F\u0670\u0640]")
-
-
-def normalize_arabic(text):
-    text = unicodedata.normalize("NFKC", str(text))
-    text = _DIAC.sub("", text)
-    for a, b in [("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ى", "ي"), ("ة", "ه")]:
-        text = text.replace(a, b)
-    text = re.sub(r"[^\w\s]", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def token_f1(a, b):
-    """Symmetric token overlap — meaning-preservation proxy."""
-    ta, tb = set(normalize_arabic(a).split()), set(normalize_arabic(b).split())
-    if not ta or not tb:
-        return 0.0
-    inter = len(ta & tb)
-    if inter == 0:
-        return 0.0
-    p, r = inter / len(tb), inter / len(ta)
-    return 2 * p * r / (p + r)
+from wahm_text import normalize_arabic, token_f1
 
 
 def char_sim(a, b):
@@ -50,7 +28,10 @@ def dialect_distance(msa, dia):
 
 
 def run(dialect, flag_below=0.5, unchanged_above=0.95):
-    rows = list(csv.DictReader(open(f"candidates_{dialect}.csv", encoding="utf-8")))
+    with open(f"candidates_{dialect}.csv", encoding="utf-8", newline="") as source:
+        rows = list(csv.DictReader(source))
+    if not rows:
+        raise SystemExit(f"ERROR: candidates_{dialect}.csv contains no rows")
 
     scored = []
     for r in rows:

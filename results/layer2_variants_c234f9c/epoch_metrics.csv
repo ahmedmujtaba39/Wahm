@@ -1,0 +1,7 @@
+variant,epoch,mean_logged_train_loss,logged_train_loss_records,eval_loss,eval_accuracy,eval_f1,best_checkpoint_by_f1
+answer_only,1,0.658791,22,0.568127,0.709178,0.728889,false
+answer_only,2,0.512719,21,0.518377,0.738975,0.764769,true
+answer_only,3,0.406519,21,0.538328,0.740167,0.760440,false
+gold_answer,1,0.511532,22,0.392898,0.823600,0.825059,false
+gold_answer,2,0.302576,21,0.460306,0.860548,0.879007,true
+gold_answer,3,0.208881,21,0.469099,0.859356,0.873391,false

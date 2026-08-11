@@ -25,6 +25,10 @@ Conditions
               answer scores as hallucinated only because it lexically diverges
               from the MSA gold, this condition removes that artifact. If the
               drift survives here, it is real.
+  dialect_aware explicitly identifies the input variety in the system prompt.
+  msa_pivot   first translates the dialect question to MSA, then answers the
+              translated question in a second call.
+  msa_restate asks for a visible MSA restatement followed by the answer.
 
 Usage
     python generate.py --models gpt4o allam --varieties msa gulf
@@ -79,9 +83,22 @@ MSA_ANSWER_SYSTEM = (
     "بغض النظر عن اللهجة المستخدمة في السؤال."
 )
 
+DIALECT_AWARE_SYSTEM = (
+    "السؤال التالي مكتوب بلهجة {variety}. افهمه كما هو وأجب عنه بدقة."
+)
+MSA_PIVOT_SYSTEM = (
+    "حوّل السؤال التالي إلى العربية الفصحى الحديثة مع الحفاظ على المعنى "
+    "بالضبط. أخرج السؤال المحوّل فقط."
+)
+MSA_RESTATE_SYSTEM = (
+    "أعد صياغة السؤال أولا بالعربية الفصحى الحديثة، ثم أجب عنه بدقة. "
+    "اعرض إعادة الصياغة والإجابة بوضوح."
+)
+
 OUT = "generations.csv"
 FIELDS = ["qid", "variety", "condition", "model", "family", "question",
-          "gold_answer", "answer", "model_id", "temperature", "timestamp", "error"]
+          "gold_answer", "answer", "pivot_question", "model_id", "temperature",
+          "resolved_model_id", "pivot_model_id", "timestamp", "error"]
 
 
 # ---------------------------------------------------------------- clients
@@ -109,25 +126,48 @@ def get_client(name):
     return _clients[name]
 
 
-def generate_one(name, question, condition, temperature, max_tokens=512, retries=4):
+def _chat(name, messages, temperature, max_tokens=512, retries=4):
     spec = MODELS[name]
     client = get_client(name)
-
-    msgs = []
-    if condition == "msa_answer":
-        msgs.append({"role": "system", "content": MSA_ANSWER_SYSTEM})
-    msgs.append({"role": "user", "content": question})
-
     for attempt in range(retries):
         try:
             r = client.chat.completions.create(
-                model=spec["model_id"], messages=msgs,
+                model=spec["model_id"], messages=messages,
                 temperature=temperature, max_tokens=max_tokens)
-            return (r.choices[0].message.content or "").strip(), ""
+            return ((r.choices[0].message.content or "").strip(), "",
+                    getattr(r, "model", spec["model_id"]))
         except Exception as e:
             if attempt == retries - 1:
-                return "", f"{type(e).__name__}: {e}"[:300]
+                return "", f"{type(e).__name__}: {e}"[:300], ""
             time.sleep(2 ** attempt)
+
+
+def generate_one(name, question, variety, condition, temperature):
+    pivot, pivot_model = "", ""
+    if condition == "msa_answer":
+        system = MSA_ANSWER_SYSTEM
+    elif condition == "dialect_aware":
+        system = DIALECT_AWARE_SYSTEM.format(variety=variety)
+    elif condition == "msa_restate":
+        system = MSA_RESTATE_SYSTEM
+    elif condition == "msa_pivot":
+        pivot, error, pivot_model = _chat(name, [
+            {"role": "system", "content": MSA_PIVOT_SYSTEM},
+            {"role": "user", "content": question},
+        ], 0.0)
+        if error:
+            return "", error, "", "", pivot_model
+        question = pivot
+        system = MSA_ANSWER_SYSTEM
+    else:
+        system = ""
+
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": question})
+    answer, error, resolved_model = _chat(name, messages, temperature)
+    return answer, error, pivot, resolved_model, pivot_model
 
 
 # ---------------------------------------------------------------- benchmark loading
@@ -139,8 +179,9 @@ def load_benchmark(varieties, limit=None):
         path = "wahm_seed_msa.csv"
         if not os.path.exists(path):
             sys.exit(f"ERROR: {path} not found")
-        for r in csv.DictReader(open(path, encoding="utf-8")):
-            items.append((r["qid"], "msa", r["question_msa"], r["gold_answer"]))
+        with open(path, encoding="utf-8", newline="") as source:
+            for r in csv.DictReader(source):
+                items.append((r["qid"], "msa", r["question_msa"], r["gold_answer"]))
 
     for v in varieties:
         if v == "msa":
@@ -150,8 +191,9 @@ def load_benchmark(varieties, limit=None):
             print(f"  skipping {v}: {path} not found "
                   "(run finalize.py once the validator returns their sheet)")
             continue
-        for r in csv.DictReader(open(path, encoding="utf-8")):
-            items.append((r["qid"], v, r["question_dialect"], r["gold_answer"]))
+        with open(path, encoding="utf-8", newline="") as source:
+            for r in csv.DictReader(source):
+                items.append((r["qid"], v, r["question_dialect"], r["gold_answer"]))
 
     if limit:
         # keep the limit per variety so arms stay parallel
@@ -168,9 +210,10 @@ def load_done():
     if not os.path.exists(OUT):
         return set()
     done = set()
-    for r in csv.DictReader(open(OUT, encoding="utf-8")):
-        if r.get("answer", "").strip() and not r.get("error", "").strip():
-            done.add((r["qid"], r["variety"], r["condition"], r["model"]))
+    with open(OUT, encoding="utf-8", newline="") as source:
+        for r in csv.DictReader(source):
+            if r.get("answer", "").strip() and not r.get("error", "").strip():
+                done.add((r["qid"], r["variety"], r["condition"], r["model"]))
     return done
 
 
@@ -199,6 +242,12 @@ def run(models, varieties, conditions, limit, temperature, sleep):
         return
 
     new_file = not os.path.exists(OUT)
+    if not new_file:
+        with open(OUT, encoding="utf-8", newline="") as existing:
+            header = next(csv.reader(existing), [])
+        if header != FIELDS:
+            sys.exit(f"ERROR: {OUT} has an incompatible header. Archive or "
+                     "migrate it before appending this experiment schema.")
     with open(OUT, "a", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=FIELDS)
         if new_file:
@@ -206,14 +255,16 @@ def run(models, varieties, conditions, limit, temperature, sleep):
 
         errors = 0
         for i, (qid, variety, question, gold, condition, model) in enumerate(todo, 1):
-            answer, err = generate_one(model, question, condition, temperature)
+            answer, err, pivot, resolved_model, pivot_model = generate_one(
+                model, question, variety, condition, temperature)
             if err:
                 errors += 1
             w.writerow(dict(
                 qid=qid, variety=variety, condition=condition, model=model,
                 family=MODELS[model]["family"], question=question,
-                gold_answer=gold, answer=answer,
+                gold_answer=gold, answer=answer, pivot_question=pivot,
                 model_id=MODELS[model]["model_id"], temperature=temperature,
+                resolved_model_id=resolved_model, pivot_model_id=pivot_model,
                 timestamp=datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 error=err))
             f.flush()
@@ -233,7 +284,8 @@ if __name__ == "__main__":
     p.add_argument("--models", nargs="+", default=None, choices=list(MODELS))
     p.add_argument("--varieties", nargs="+", default=None, choices=VARIETIES)
     p.add_argument("--conditions", nargs="+", default=["direct"],
-                   choices=["direct", "msa_answer"])
+                   choices=["direct", "msa_answer", "dialect_aware",
+                            "msa_pivot", "msa_restate"])
     p.add_argument("--all", action="store_true", help="all models, all varieties")
     p.add_argument("--limit", type=int, default=None,
                    help="first N questions per variety (use 20 for a pilot)")

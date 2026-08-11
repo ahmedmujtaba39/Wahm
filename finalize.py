@@ -28,32 +28,9 @@ Usage
     python finalize.py gulf --min-backtrans 0.45
 """
 
-import argparse, csv, json, re, statistics, sys, unicodedata
+import argparse, csv, json, statistics, sys
 
-# ---- same normalization as Layer 1, so all scores are comparable ----
-_DIAC = re.compile(r"[\u064B-\u065F\u0670\u0640]")
-
-
-def normalize_arabic(text):
-    text = unicodedata.normalize("NFKC", str(text))
-    text = _DIAC.sub("", text)
-    for a, b in [("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ى", "ي"), ("ة", "ه")]:
-        text = text.replace(a, b)
-    text = re.sub(r"[^\w\s]", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def token_f1(a, b):
-    """Symmetric token overlap. Used for both back-translation similarity
-    and dialect distance, so the two numbers are on the same scale."""
-    ta, tb = set(normalize_arabic(a).split()), set(normalize_arabic(b).split())
-    if not ta or not tb:
-        return 0.0
-    inter = len(ta & tb)
-    if inter == 0:
-        return 0.0
-    p, r = inter / len(tb), inter / len(ta)
-    return 2 * p * r / (p + r)
+from wahm_text import normalize_arabic, token_f1
 
 
 def levenshtein(a, b):
@@ -74,10 +51,11 @@ def levenshtein(a, b):
 
 
 def load(dialect):
-    cand = {r["qid"]: r for r in
-            csv.DictReader(open(f"candidates_{dialect}.csv", encoding="utf-8"))}
+    with open(f"candidates_{dialect}.csv", encoding="utf-8", newline="") as source:
+        cand = {r["qid"]: r for r in csv.DictReader(source)}
     try:
-        val = list(csv.DictReader(open(f"validation_{dialect}.csv", encoding="utf-8")))
+        with open(f"validation_{dialect}.csv", encoding="utf-8", newline="") as source:
+            val = list(csv.DictReader(source))
     except FileNotFoundError:
         sys.exit(f"ERROR: validation_{dialect}.csv not found. "
                  "Has the validator returned their sheet yet?")
