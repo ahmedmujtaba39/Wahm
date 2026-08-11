@@ -1,0 +1,11 @@
+ex_id,qid,question_type,msa_question,dialect_question,sub_variety,notes
+ex_01,wahm_015,how many / number,كم يتراوح عدد بيوض السلمندر التي تضعها الانثى؟,كم بتتراوح كمية بيوض السلمندر البتضعها الانثى؟,,"Note that the of ""ب"" before the verbs is common in Sudanese Arabic to indicate the present-tense. "
+ex_02,wahm_008,when / date,متى تمت كتابة وثيقة إعلان قيام دولة إسرائيل ؟,بتين اتكتبت وثيقة إعلان قيام دولة إسرائيل؟,,"Although ""بتين"" is used as a translation of ""when,"" ""متين"" is also commonly used in the Sudanese dialect. "
+ex_03,wahm_003,where / place,أين يقع مسجد السلطان عبد المجيد؟,مسجد السلطان عبد المجيد موجود وين؟,,
+ex_04,wahm_001,who / person,من هو مكتشف المرو أو الكوارتز ؟,منو مكتشف المرو أو الكوارتز؟,,
+ex_05,wahm_011,what is / definition,ما هو الطّيف الكهرومغناطيسي؟,شنو (هو) الطّيف الكهرومغناطيسي؟,,
+ex_06,wahm_026,how many / measurement,كم يبلغ أقصى عمق لبحر قزوين؟,كم ببلغ أقصى عمق لبحر قزوين؟,,
+ex_07,wahm_024,when / year,متى أقيمت بطولة (غرب آسيا) لكرة القدم لأول مرة؟,أقيمت بطولة (غرب آسيا) لكرة القدم لأول مرة متين؟,,"Here, “متين” is used as an alternative to “بتين,” although both are correct. Unlike in ex_02, the word is placed at the end of the sentence. This is a common pattern in Sudanese Arabic, and both word orders are correct."
+ex_08,wahm_014,where / place,اين ولد صدام حسين؟,وين(و) ولد صدام حسين؟/ولد صدام حسين وين(و)؟,,"The placement of the word ""وينو/وين"" is correct in both sentences. "
+ex_09,wahm_133,which / entity,أي عضو في الجسم مسؤول على نقل الأوكسيجين؟,أي عضو في الجسم مسؤول على نقل الأوكسيجين؟,,"In this case, the sentence remains unchanged due to the similarities shared between the Sudanese dialect and Modern Standard Arabic."
+ex_10,wahm_000,how many / count,كم عدد مرات فوز الأوروغواي ببطولة كاس العالم لكرو القدم؟,الأوروغواي فازت ببطولة كأس العالم لكرة القدم كم مرة؟/كم مرة فازت الأوروغواي ببطولة كأس العالم لكرة القدم؟,,

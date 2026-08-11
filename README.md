@@ -17,7 +17,8 @@ valid result and means it decreased.
 |---|---|---|
 | MSA seed | Complete, pending a source/data audit | `wahm_seed_msa.csv` (300 unique QIDs) |
 | Gulf exemplars | Confirmed | `exemplars_gulf.csv` |
-| Other dialect exemplars | Collected externally; not yet in this checkout | Awaiting repository files |
+| Sudanese exemplars | Confirmed | `exemplars_sudanese.csv` |
+| Egyptian and Levantine exemplars | Collected externally; not yet in this checkout | Awaiting repository files |
 | Dialect translations | Not generated/validated | Translation, QC, and finalization scripts only |
 | Model generations | Not run | `generate.py` |
 | Layer 1 | Implemented; source-label evaluation saved | `score_layer1.py`, `results/layer1_arahallueval.json` |
