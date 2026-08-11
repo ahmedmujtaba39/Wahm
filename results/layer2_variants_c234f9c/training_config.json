@@ -1,0 +1,90 @@
+{
+  "run_commit": "c234f9c79a394f1d415314217c93af1326f41e48",
+  "completed_at_utc": "2026-08-10T16:45:44Z",
+  "exit_code": 0,
+  "platform": {
+    "orchestrator": "NRP Nautilus Kubernetes",
+    "node": "moff.sdstate.edu",
+    "gpu": "Quadro RTX 6000"
+  },
+  "data": {
+    "path": "judge_train.csv",
+    "sha256": "13C5383E1BBCC896946EACB32D91B15F0055CC2EB3FAE311CD721F83C69EE12A",
+    "rows": 4195,
+    "target": "hallucinated",
+    "labels": {
+      "clean": 0,
+      "hallucinated": 1
+    },
+    "split": {
+      "method": "train_test_split",
+      "test_size": 0.2,
+      "random_state": 42,
+      "stratified": true,
+      "train_rows": 3356,
+      "test_rows": 839,
+      "train_clean": 1478,
+      "train_hallucinated": 1878,
+      "test_clean": 370,
+      "test_hallucinated": 469
+    }
+  },
+  "base_model": {
+    "id": "aubmindlab/bert-base-arabertv2",
+    "revision": "97522efce17efa33036ac619802d5cec238dcad9",
+    "verified_snapshot_files": 12,
+    "num_labels": 2
+  },
+  "variants": {
+    "answer_only": {
+      "inputs": ["answer"]
+    },
+    "gold_answer": {
+      "inputs": ["gold_answer", "answer"],
+      "pair_encoding": true
+    }
+  },
+  "tokenization": {
+    "truncation": true,
+    "padding": "max_length",
+    "max_length": 512
+  },
+  "optimization": {
+    "epochs": 3,
+    "train_batch_size": 8,
+    "eval_batch_size": 32,
+    "learning_rate": 0.00002,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "class_weight": "balanced",
+    "class_weights": {
+      "clean": 1.13531799729364,
+      "hallucinated": 0.8935037273695421
+    },
+    "optimizer": "Transformers TrainingArguments default; not overridden",
+    "lr_scheduler": "Transformers TrainingArguments default; not overridden",
+    "fp16": true,
+    "seed": 42
+  },
+  "logging_and_selection": {
+    "logging_steps": 20,
+    "logging_first_step": true,
+    "evaluation_strategy": "epoch",
+    "save_strategy": "epoch",
+    "save_total_limit": 2,
+    "load_best_model_at_end": true,
+    "metric_for_best_model": "f1",
+    "report_to": "none",
+    "decision_rule": "argmax over two logits; equivalent to probability threshold 0.5"
+  },
+  "versions": {
+    "torch": "2.7.1+cu118",
+    "transformers": "4.46.3",
+    "datasets": "3.6.0",
+    "scikit_learn": "1.9.0"
+  },
+  "final_model_sha256": {
+    "answer_only": "DDCC2FD38866F22C3607A77EA23B79CBCF5549766162CAF2ED1F10E6D216815F",
+    "gold_answer": "57F2D72BAD55CFEBD521DA993E1E38F5FD301BC9AC7A358C546D84CE80F3D81A"
+  }
+}

@@ -21,7 +21,7 @@ valid result and means it decreased.
 | Dialect translations | Not generated/validated | Translation, QC, and finalization scripts only |
 | Model generations | Not run | `generate.py` |
 | Layer 1 | Implemented; source-label evaluation saved | `score_layer1.py`, `results/layer1_arahallueval.json` |
-| Layer 2 | Binary training data validated; clean AraBERT rerun pending | `judge_train.csv`, `train_judge.py`, `score_layer2.py`, `infra/nautilus/` |
+| Layer 2 | Specified two-variant AraBERT run complete; artifacts verified | `judge_train.csv`, `train_layer2_variants.py`, `results/layer2_variants_c234f9c/` |
 | Layer 3 human validation | Blinded preparation/evaluation implemented | `prepare_layer3.py`, `evaluate_layer3.py` |
 
 The earlier extensionless `layer 1` file is a failed AraBERT environment
