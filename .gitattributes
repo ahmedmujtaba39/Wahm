@@ -1,1 +1,3 @@
 results/layer2_variants_c234f9c/training.log -whitespace
+candidates_*.csv -whitespace
+validation_*.csv -whitespace
