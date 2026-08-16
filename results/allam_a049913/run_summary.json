@@ -1,0 +1,22 @@
+{
+  "git_commit": "a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e",
+  "model": "humain-ai/ALLaM-7B-Instruct-preview",
+  "model_revision": "a28dd1e67420cde72d3629c8633a974cf7d9c366",
+  "serving_runtime": "vllm/vllm-openai:v0.10.2",
+  "variety": "msa",
+  "condition": "direct",
+  "temperature": 0.0,
+  "rows": 300,
+  "unique_qids": 300,
+  "successful": 300,
+  "errors": 0,
+  "generations_sha256": "cd1dcddf24f337220894b3e22466296bcd1a0f56ca08dd83439eeea808f0e3fd",
+  "layer1": {
+    "clean": 82,
+    "hallucinated": 69,
+    "defer_to_layer2": 149,
+    "note": "Layer 1 counts are preliminary routing decisions, not the final hallucination rate."
+  },
+  "hds": null,
+  "hds_note": "HDS requires paired dialect outputs and cannot be computed from the MSA baseline alone."
+}

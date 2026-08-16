@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-allam-report
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: allam-report
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: allam-report
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: report
+          image: python:3.11-slim
+          command: ["python", "-c"]
+          args:
+            - |
+              import csv, hashlib, json, os
+              from pathlib import Path
+              path = (Path('/workspace/results/wahm-generations') /
+                      os.environ['WAHM_GIT_COMMIT'] / 'allam/generations.csv')
+              raw = path.read_bytes()
+              rows = list(csv.DictReader(raw.decode('utf-8').splitlines()))
+              successful = sum(bool(r['answer'].strip()) and not r['error'].strip()
+                               for r in rows)
+              errors = sum(bool(r['error'].strip()) for r in rows)
+              print(json.dumps({
+                  'path': str(path),
+                  'sha256': hashlib.sha256(raw).hexdigest(),
+                  'rows': len(rows),
+                  'successful': successful,
+                  'errors': errors,
+              }, sort_keys=True))
+          env:
+            - name: WAHM_GIT_COMMIT
+              value: __WAHM_GIT_COMMIT__
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+              readOnly: true
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: wahm-allam-539948
+            readOnly: true
