@@ -1,0 +1,167 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-allam-generate
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: allam-generate
+spec:
+  activeDeadlineSeconds: 86400
+  backoffLimit: 2
+  podFailurePolicy:
+    rules:
+      - action: Ignore
+        onPodConditions:
+          - type: DisruptionTarget
+            status: "True"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: allam-generate
+    spec:
+      priorityClassName: opportunistic
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 120
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - uicnrp-fiona2.evl.uic.edu
+      containers:
+        - name: generate
+          image: vllm/vllm-openai:v0.10.2
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              repo="/workspace/repos/wahm-${WAHM_GIT_COMMIT}"
+              snapshot=$(python3 - <<'PY'
+              import os
+              from huggingface_hub import snapshot_download
+
+              print(snapshot_download(
+                  repo_id=os.environ["WAHM_ALLAM_MODEL"],
+                  revision=os.environ["WAHM_ALLAM_REVISION"],
+                  cache_dir="/model-cache",
+                  allow_patterns=[
+                      "*.json", "*.model", "*.safetensors", "*.py",
+                      "LICENSE*", "README.md",
+                  ],
+              ))
+              PY
+              )
+              test -d "${snapshot}"
+              mkdir -p /workspace/results
+              export HF_HUB_OFFLINE=1
+              export TRANSFORMERS_OFFLINE=1
+              python3 -m vllm.entrypoints.openai.api_server \
+                --model "${snapshot}" \
+                --served-model-name "${WAHM_ALLAM_MODEL}" \
+                --host 127.0.0.1 \
+                --port 8000 \
+                --dtype bfloat16 \
+                --max-model-len 4096 \
+                --gpu-memory-utilization 0.90 \
+                > /workspace/results/allam-vllm.log 2>&1 &
+              server_pid=$!
+              trap 'kill ${server_pid} 2>/dev/null || true' EXIT
+              python3 - <<'PY'
+              import json
+              import time
+              import urllib.request
+
+              url = "http://127.0.0.1:8000/health"
+              for attempt in range(1800):
+                  try:
+                      with urllib.request.urlopen(url, timeout=2) as response:
+                          if response.status == 200:
+                              print("vLLM server ready")
+                              break
+                  except Exception:
+                      pass
+                  time.sleep(2)
+              else:
+                  raise SystemExit("vLLM server did not become ready")
+              PY
+              cd "${repo}"
+              python3 generate.py \
+                --models allam \
+                --varieties msa \
+                --conditions direct \
+                --temperature 0 \
+                --sleep 0
+              output="/workspace/results/wahm-generations/${WAHM_GIT_COMMIT}/allam"
+              mkdir -p "${output}"
+              cp generations.csv "${output}/generations.csv"
+              python3 - <<'PY' | tee /dev/termination-log
+              import csv
+              import json
+              import os
+              from pathlib import Path
+
+              path = (Path("/workspace/results/wahm-generations") /
+                      os.environ["WAHM_GIT_COMMIT"] / "allam/generations.csv")
+              rows = list(csv.DictReader(path.open(encoding="utf-8")))
+              successful = [r for r in rows if r["answer"].strip() and not r["error"].strip()]
+              print(json.dumps({
+                  "model": os.environ["WAHM_ALLAM_MODEL"],
+                  "model_revision": os.environ["WAHM_ALLAM_REVISION"],
+                  "git_commit": os.environ["WAHM_GIT_COMMIT"],
+                  "output": str(path),
+                  "rows": len(rows),
+                  "successful": len(successful),
+                  "failed": len(rows) - len(successful),
+              }, sort_keys=True))
+              PY
+          env:
+            - name: WAHM_GIT_COMMIT
+              value: __WAHM_GIT_COMMIT__
+            - name: WAHM_ALLAM_MODEL
+              value: humain-ai/ALLaM-7B-Instruct-preview
+            - name: WAHM_ALLAM_REVISION
+              value: a28dd1e67420cde72d3629c8633a974cf7d9c366
+            - name: ALLAM_DEPLOYMENT
+              value: humain-ai/ALLaM-7B-Instruct-preview
+            - name: AZURE_ALLAM_ENDPOINT
+              value: http://127.0.0.1:8000/v1
+            - name: AZURE_ALLAM_KEY
+              value: local-vllm-no-auth
+            - name: HF_HOME
+              value: /model-cache
+            - name: HF_HUB_DISABLE_XET
+              value: "1"
+          resources:
+            requests:
+              cpu: "4"
+              memory: 16Gi
+              ephemeral-storage: 20Gi
+              nvidia.com/a100: "1"
+            limits:
+              cpu: "8"
+              memory: 32Gi
+              ephemeral-storage: 25Gi
+              nvidia.com/a100: "1"
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: dshm
+              mountPath: /dev/shm
+            - name: model-cache
+              mountPath: /model-cache
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: wahm-allam-539948
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 8Gi
+        - name: model-cache
+          emptyDir:
+            sizeLimit: 20Gi
