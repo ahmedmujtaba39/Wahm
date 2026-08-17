@@ -37,6 +37,7 @@ Usage
 """
 
 import argparse, csv, os, sys, time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------- model registry
@@ -232,7 +233,7 @@ def load_done():
 
 
 # ---------------------------------------------------------------- main loop
-def run(models, varieties, conditions, limit, temperature, sleep):
+def run(models, varieties, conditions, limit, temperature, sleep, workers=1):
     items = load_benchmark(varieties, limit)
     if not items:
         sys.exit("ERROR: no benchmark items loaded")
@@ -249,6 +250,7 @@ def run(models, varieties, conditions, limit, temperature, sleep):
     print(f"models          : {', '.join(models)}")
     print(f"varieties       : {', '.join(varieties)}")
     print(f"conditions      : {', '.join(conditions)}")
+    print(f"workers         : {workers}")
     print(f"already done    : {len(done)}")
     print(f"to generate     : {len(todo)}\n")
     if not todo:
@@ -267,26 +269,45 @@ def run(models, varieties, conditions, limit, temperature, sleep):
         if new_file:
             w.writeheader()
 
-        errors = 0
-        for i, (qid, variety, question, gold, condition, model) in enumerate(todo, 1):
-            answer, err, pivot, resolved_model, pivot_model = generate_one(
-                model, question, variety, condition, temperature)
-            if err:
-                errors += 1
-            w.writerow(dict(
-                qid=qid, variety=variety, condition=condition, model=model,
-                family=MODELS[model]["family"], question=question,
-                gold_answer=gold, answer=answer, pivot_question=pivot,
-                model_id=MODELS[model]["model_id"], temperature=temperature,
-                resolved_model_id=resolved_model, pivot_model_id=pivot_model,
-                timestamp=datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                error=err))
-            f.flush()
+        def generate_task(task):
+            qid, variety, question, gold, condition, model = task
+            result = generate_one(model, question, variety, condition, temperature)
+            return task, result
 
-            if i % 25 == 0 or i == len(todo):
-                print(f"  {i}/{len(todo)}  (errors: {errors})")
-            if sleep:
-                time.sleep(sleep)
+        executor = None
+        if workers > 1:
+            # Initialize clients before worker threads to avoid creation races.
+            for model in models:
+                get_client(model)
+            executor = ThreadPoolExecutor(max_workers=workers)
+            generated = executor.map(generate_task, todo)
+        else:
+            generated = map(generate_task, todo)
+
+        errors = 0
+        try:
+            for i, (task, result) in enumerate(generated, 1):
+                qid, variety, question, gold, condition, model = task
+                answer, err, pivot, resolved_model, pivot_model = result
+                if err:
+                    errors += 1
+                w.writerow(dict(
+                    qid=qid, variety=variety, condition=condition, model=model,
+                    family=MODELS[model]["family"], question=question,
+                    gold_answer=gold, answer=answer, pivot_question=pivot,
+                    model_id=MODELS[model]["model_id"], temperature=temperature,
+                    resolved_model_id=resolved_model, pivot_model_id=pivot_model,
+                    timestamp=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                    error=err))
+                f.flush()
+
+                if i % 25 == 0 or i == len(todo):
+                    print(f"  {i}/{len(todo)}  (errors: {errors})")
+                if sleep:
+                    time.sleep(sleep)
+        finally:
+            if executor is not None:
+                executor.shutdown(wait=True)
 
     print(f"\nwrote {OUT}")
     if errors:
@@ -305,9 +326,12 @@ if __name__ == "__main__":
                    help="first N questions per variety (use 20 for a pilot)")
     p.add_argument("--temperature", type=float, default=0.0)
     p.add_argument("--sleep", type=float, default=0.0, help="pause between calls")
+    p.add_argument("--workers", type=int, default=1,
+                   help="concurrent requests (use only with providers that allow it)")
     a = p.parse_args()
 
     models = list(MODELS) if a.all else (a.models or ["gpt4o"])
     varieties = VARIETIES if a.all else (a.varieties or ["msa"])
 
-    run(models, varieties, a.conditions, a.limit, a.temperature, a.sleep)
+    run(models, varieties, a.conditions, a.limit, a.temperature, a.sleep,
+        a.workers)

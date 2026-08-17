@@ -113,9 +113,9 @@ spec:
             - name: WAHM_GIT_REPOSITORY
               value: https://github.com/cyberuniversal/Wahm.git
             - name: WAHM_GIT_COMMIT
-              value: __WAHM_GIT_COMMIT__
+              value: 67f2b9a87d82bb951a8ae23ab8dcc2d7a5c28a47
             - name: WAHM_RUN_ID
-              value: fanar1-d33480e-__WAHM_GIT_SHORT__
+              value: fanar1-d33480e-67f2b9a
             - name: WAHM_LAYER2_RUN
               value: c234f9c79a394f1d415314217c93af1326f41e48
             - name: WAHM_LAYER2_THRESHOLD

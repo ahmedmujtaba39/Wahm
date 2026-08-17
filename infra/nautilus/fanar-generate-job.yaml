@@ -159,7 +159,8 @@ spec:
                 --varieties msa gulf egyptian levantine sudanese \
                 --conditions direct \
                 --temperature 0 \
-                --sleep 0
+                --sleep 0 \
+                --workers 16
               output="/workspace/results/wahm-generations/${WAHM_OUTPUT_RUN}/fanar"
               cp generations.csv "${output}/generations.csv"
               python3 - <<'PY' | tee /dev/termination-log
@@ -185,9 +186,9 @@ spec:
               PY
           env:
             - name: WAHM_GIT_COMMIT
-              value: __WAHM_GIT_COMMIT__
+              value: 67f2b9a87d82bb951a8ae23ab8dcc2d7a5c28a47
             - name: WAHM_OUTPUT_RUN
-              value: fanar1-d33480e-__WAHM_GIT_SHORT__
+              value: fanar1-d33480e-67f2b9a
             - name: WAHM_FANAR_MODEL
               value: QCRI/Fanar-1-9B
             - name: WAHM_FANAR_REVISION
