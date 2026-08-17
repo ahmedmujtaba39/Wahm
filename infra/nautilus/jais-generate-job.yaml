@@ -24,6 +24,15 @@ spec:
       priorityClassName: opportunistic
       restartPolicy: Never
       terminationGracePeriodSeconds: 120
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - gp-engine.hpc.okstate.edu
       containers:
         - name: generate
           image: vllm/vllm-openai:v0.27.1
