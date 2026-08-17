@@ -3,3 +3,4 @@ candidates_*.csv -whitespace
 validation_*.csv -whitespace
 results/allam_a049913/scores_combined_msa.csv -text
 results/allam_a28dd1e_48f4644/*.csv -text
+results/jais2_f7df1cb_bbd2ffe/*.csv -text -whitespace

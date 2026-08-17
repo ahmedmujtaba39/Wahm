@@ -1,0 +1,65 @@
+{
+  "combined": {
+    "clean": 758,
+    "hallucinated": 742
+  },
+  "combined_by_variety": {
+    "egyptian": {
+      "clean": 146,
+      "hallucinated": 154
+    },
+    "gulf": {
+      "clean": 154,
+      "hallucinated": 146
+    },
+    "levantine": {
+      "clean": 150,
+      "hallucinated": 150
+    },
+    "msa": {
+      "clean": 152,
+      "hallucinated": 148
+    },
+    "sudanese": {
+      "clean": 156,
+      "hallucinated": 144
+    }
+  },
+  "files": {
+    "generations.csv": {
+      "bytes": 1384983,
+      "sha256": "76a2642c4f2678e42ee15ab515337daaef9fa0d2d52fc9cc8005d59ca94be48c"
+    },
+    "input_manifest.json": {
+      "bytes": 1482,
+      "sha256": "df2de0d81bb62f8b3175e339ed9b2452a5f0efdecb42433468a4520955ffb953"
+    },
+    "scores_combined.csv": {
+      "bytes": 1431922,
+      "sha256": "f8e2ebed9a0b2e583c517917d31421b7edac0c29dea2e7987b00e5dcb869c4f7"
+    },
+    "scores_layer1.csv": {
+      "bytes": 1407882,
+      "sha256": "dabd7894bf748f456cc01196da205a3bbddd6fe78b5c450e42fc488e18d150be"
+    }
+  },
+  "input_commit": "bbd2ffeb43bd7f4aeeeab46ca5b3de5ad30da9c8",
+  "layer1": {
+    "clean": 362,
+    "defer": 660,
+    "hallucinated": 478
+  },
+  "layer2_run": "c234f9c79a394f1d415314217c93af1326f41e48",
+  "layer2_scored": 660,
+  "layer2_threshold": 0.5,
+  "layer2_weights_sha256": "57f2d72bad55cfebd521da993e1e38f5fd301bc9ac7a358c546d84ce80f3d81a",
+  "rows": 1500,
+  "rows_by_variety": {
+    "egyptian": 300,
+    "gulf": 300,
+    "levantine": 300,
+    "msa": 300,
+    "sudanese": 300
+  },
+  "run_id": "jais2-f7df1cb-bbd2ffe"
+}
