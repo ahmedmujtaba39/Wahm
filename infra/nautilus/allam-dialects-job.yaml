@@ -1,0 +1,202 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-allam-dialects
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: allam-dialects
+spec:
+  activeDeadlineSeconds: 86400
+  backoffLimit: 2
+  podFailurePolicy:
+    rules:
+      - action: Ignore
+        onPodConditions:
+          - type: DisruptionTarget
+            status: "True"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: allam-dialects
+    spec:
+      priorityClassName: opportunistic
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: generate
+          image: vllm/vllm-openai:v0.10.2
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              repo="/workspace/repos/wahm-${WAHM_INPUT_COMMIT}"
+              if [[ ! -d "${repo}/.git" ]]; then
+                git clone "${WAHM_GIT_REPOSITORY}" "${repo}"
+              fi
+              git -C "${repo}" fetch origin
+              git -C "${repo}" checkout --detach "${WAHM_INPUT_COMMIT}"
+              python3 - <<'PY'
+              import csv, hashlib, json, os
+              from pathlib import Path
+
+              repo = Path('/workspace/repos') / ('wahm-' + os.environ['WAHM_INPUT_COMMIT'])
+              manifest = {
+                  'status': 'provisional_unreviewed_candidates',
+                  'input_commit': os.environ['WAHM_INPUT_COMMIT'],
+                  'dialects': {},
+              }
+              for dialect in ('gulf', 'egyptian', 'levantine', 'sudanese'):
+                  source = repo / f'candidates_{dialect}.csv'
+                  raw = source.read_bytes()
+                  rows = list(csv.DictReader(raw.decode('utf-8-sig').splitlines()))
+                  target = repo / f'final_{dialect}.csv'
+                  with target.open('w', encoding='utf-8', newline='') as stream:
+                      writer = csv.DictWriter(
+                          stream,
+                          fieldnames=['qid', 'question_dialect', 'gold_answer'])
+                      writer.writeheader()
+                      for row in rows:
+                          writer.writerow({
+                              'qid': row['qid'],
+                              'question_dialect': row['dialect_candidate'],
+                              'gold_answer': row['gold_answer'],
+                          })
+                  manifest['dialects'][dialect] = {
+                      'rows': len(rows),
+                      'source': source.name,
+                      'source_sha256': hashlib.sha256(raw).hexdigest(),
+                  }
+              output = (Path('/workspace/results/wahm-generations') /
+                        os.environ['WAHM_OUTPUT_RUN'] / 'allam')
+              output.mkdir(parents=True, exist_ok=True)
+              (output / 'input_manifest.json').write_text(
+                  json.dumps(manifest, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8')
+              PY
+              snapshot=$(python3 - <<'PY'
+              import os
+              from huggingface_hub import snapshot_download
+
+              print(snapshot_download(
+                  repo_id=os.environ['WAHM_ALLAM_MODEL'],
+                  revision=os.environ['WAHM_ALLAM_REVISION'],
+                  cache_dir='/model-cache',
+                  allow_patterns=[
+                      '*.json', '*.model', '*.safetensors', '*.py',
+                      'LICENSE*', 'README.md',
+                  ],
+              ))
+              PY
+              )
+              test -d "${snapshot}"
+              export HF_HUB_OFFLINE=1
+              export TRANSFORMERS_OFFLINE=1
+              python3 -m vllm.entrypoints.openai.api_server \
+                --model "${snapshot}" \
+                --served-model-name "${WAHM_ALLAM_MODEL}" \
+                --host 127.0.0.1 \
+                --port 8000 \
+                --dtype bfloat16 \
+                --max-model-len 4096 \
+                --gpu-memory-utilization 0.90 \
+                > /workspace/results/allam-vllm-dialects.log 2>&1 &
+              server_pid=$!
+              trap 'kill ${server_pid} 2>/dev/null || true' EXIT
+              python3 - <<'PY'
+              import time, urllib.request
+              for _ in range(1800):
+                  try:
+                      with urllib.request.urlopen('http://127.0.0.1:8000/health',
+                                                  timeout=2) as response:
+                          if response.status == 200:
+                              print('vLLM server ready')
+                              break
+                  except Exception:
+                      pass
+                  time.sleep(2)
+              else:
+                  raise SystemExit('vLLM server did not become ready')
+              PY
+              output="/workspace/results/wahm-generations/${WAHM_OUTPUT_RUN}/allam"
+              cp "/workspace/results/wahm-generations/${WAHM_MSA_RUN}/allam/generations.csv" \
+                 "${repo}/generations.csv"
+              cd "${repo}"
+              python3 generate.py \
+                --models allam \
+                --varieties msa gulf egyptian levantine sudanese \
+                --conditions direct \
+                --temperature 0 \
+                --sleep 0
+              cp generations.csv "${output}/generations.csv"
+              python3 - <<'PY' | tee /dev/termination-log
+              import csv, json, os
+              from collections import Counter
+              from pathlib import Path
+
+              path = (Path('/workspace/results/wahm-generations') /
+                      os.environ['WAHM_OUTPUT_RUN'] / 'allam/generations.csv')
+              rows = list(csv.DictReader(path.open(encoding='utf-8')))
+              ok = [r for r in rows if r['answer'].strip() and not r['error'].strip()]
+              print(json.dumps({
+                  'output': str(path),
+                  'rows': len(rows),
+                  'successful': len(ok),
+                  'failed': len(rows) - len(ok),
+                  'successful_by_variety': dict(Counter(r['variety'] for r in ok)),
+                  'input_status': 'provisional_unreviewed_candidates',
+              }, sort_keys=True))
+              PY
+          env:
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/ahmedmujtaba39/Wahm.git
+            - name: WAHM_INPUT_COMMIT
+              value: 48f46446967841275c95af4e31a5ae8069b1ac4a
+            - name: WAHM_OUTPUT_RUN
+              value: allam-a28dd1e-48f4644
+            - name: WAHM_MSA_RUN
+              value: a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e
+            - name: WAHM_ALLAM_MODEL
+              value: humain-ai/ALLaM-7B-Instruct-preview
+            - name: WAHM_ALLAM_REVISION
+              value: a28dd1e67420cde72d3629c8633a974cf7d9c366
+            - name: ALLAM_DEPLOYMENT
+              value: humain-ai/ALLaM-7B-Instruct-preview
+            - name: AZURE_ALLAM_ENDPOINT
+              value: http://127.0.0.1:8000/v1
+            - name: AZURE_ALLAM_KEY
+              value: local-vllm-no-auth
+            - name: HF_HOME
+              value: /model-cache
+            - name: HF_HUB_DISABLE_XET
+              value: "1"
+          resources:
+            requests:
+              cpu: "4"
+              memory: 16Gi
+              ephemeral-storage: 20Gi
+              nvidia.com/a100: "1"
+            limits:
+              cpu: "8"
+              memory: 32Gi
+              ephemeral-storage: 25Gi
+              nvidia.com/a100: "1"
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: dshm
+              mountPath: /dev/shm
+            - name: model-cache
+              mountPath: /model-cache
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: wahm-allam-539948
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 8Gi
+        - name: model-cache
+          emptyDir:
+            sizeLimit: 20Gi
