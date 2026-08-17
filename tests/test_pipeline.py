@@ -135,6 +135,30 @@ class TranslationTests(unittest.TestCase):
 
 
 class GenerationTests(unittest.TestCase):
+    def test_base_model_uses_text_completion_endpoint(self):
+        class Completions:
+            def create(self, **kwargs):
+                from types import SimpleNamespace
+                self.kwargs = kwargs
+                return SimpleNamespace(
+                    model="resolved-fanar",
+                    choices=[SimpleNamespace(text="الدوحة")])
+
+        from types import SimpleNamespace
+        completions = Completions()
+        generate._clients["fanar"] = SimpleNamespace(completions=completions)
+        old_mode = generate.MODELS["fanar"]["api_mode"]
+        generate.MODELS["fanar"]["api_mode"] = "completion"
+        try:
+            answer, error, pivot, resolved, pivot_model = generate.generate_one(
+                "fanar", "ما هي عاصمة قطر؟", "msa", "direct", 0.0)
+        finally:
+            generate.MODELS["fanar"]["api_mode"] = old_mode
+            generate._clients.clear()
+        self.assertEqual(error, "")
+        self.assertEqual((answer, resolved), ("الدوحة", "resolved-fanar"))
+        self.assertEqual(completions.kwargs["prompt"], "ما هي عاصمة قطر؟")
+
     def test_msa_pivot_records_both_resolved_models(self):
         class Completions:
             calls = 0

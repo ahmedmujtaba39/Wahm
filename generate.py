@@ -40,9 +40,8 @@ import argparse, csv, os, sys, time
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------- model registry
-# All entries speak the OpenAI chat-completions schema. If Fanar or ALLaM turn
-# out not to, only `call_openai_compatible` needs a sibling function; the rest
-# of the script is provider-agnostic.
+# Entries use either the OpenAI chat-completions or completions schema. The
+# latter is needed for base checkpoints that do not define a chat template.
 MODELS = {
     "gpt4o": dict(
         model_id="gpt-4o",
@@ -63,10 +62,11 @@ MODELS = {
         family="arabic_centric",
     ),
     "fanar": dict(
-        model_id=os.getenv("FANAR_MODEL", "Fanar"),
+        model_id=os.getenv("FANAR_MODEL", "QCRI/Fanar-1-9B"),
         base_url_env="FANAR_BASE_URL",        # from your approved QCRI API access
         key_env="FANAR_API_KEY",
         family="arabic_centric",
+        api_mode=os.getenv("FANAR_API_MODE", "chat"),
     ),
     "falcon": dict(
         model_id="tiiuae/falcon-h1-34b-instruct",
@@ -137,10 +137,18 @@ def _chat(name, messages, temperature, max_tokens=512, retries=4):
     client = get_client(name)
     for attempt in range(retries):
         try:
-            r = client.chat.completions.create(
-                model=spec["model_id"], messages=messages,
-                temperature=temperature, max_tokens=max_tokens)
-            return ((r.choices[0].message.content or "").strip(), "",
+            if spec.get("api_mode", "chat") == "completion":
+                prompt = "\n\n".join(message["content"] for message in messages)
+                r = client.completions.create(
+                    model=spec["model_id"], prompt=prompt,
+                    temperature=temperature, max_tokens=max_tokens)
+                answer = r.choices[0].text
+            else:
+                r = client.chat.completions.create(
+                    model=spec["model_id"], messages=messages,
+                    temperature=temperature, max_tokens=max_tokens)
+                answer = r.choices[0].message.content
+            return ((answer or "").strip(), "",
                     getattr(r, "model", spec["model_id"]))
         except Exception as e:
             if attempt == retries - 1:

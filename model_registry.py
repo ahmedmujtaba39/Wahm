@@ -45,7 +45,7 @@ MODELS = {
     },
 
     "fanar-9b": {
-        "model_id": "Fanar",
+        "model_id": "QCRI/Fanar-1-9B",
         "display_name": "Fanar 1 9B",
         "family": "arabic_centric",
         "origin": "QCRI, Qatar",
@@ -53,7 +53,7 @@ MODELS = {
         "size": "9B",
         "base_url_env": "FANAR_BASE_URL",
         "key_env": "FANAR_API_KEY",
-        "notes": "Request API access at fanar.qa; MENAValues evaluated this model",
+        "notes": "Open base checkpoint; evaluate through raw text completion",
     },
 
     "falcon-arabic-7b": {
