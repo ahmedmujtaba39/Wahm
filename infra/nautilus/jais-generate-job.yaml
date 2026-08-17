@@ -109,10 +109,42 @@ spec:
               PY
               )
               test -d "${snapshot}"
+              tokenizer_dir="/workspace/runtime/jais-tokenizer-${WAHM_JAIS_REVISION}"
+              export WAHM_JAIS_SNAPSHOT="${snapshot}"
+              export WAHM_JAIS_TOKENIZER_DIR="${tokenizer_dir}"
+              python3 - <<'PY'
+              import hashlib, json, os, shutil
+              from pathlib import Path
+              from transformers import AutoTokenizer
+
+              snapshot = Path(os.environ['WAHM_JAIS_SNAPSHOT'])
+              tokenizer_dir = Path(os.environ['WAHM_JAIS_TOKENIZER_DIR'])
+              if tokenizer_dir.exists():
+                  shutil.rmtree(tokenizer_dir)
+              tokenizer = AutoTokenizer.from_pretrained(
+                  snapshot, local_files_only=True, fix_mistral_regex=True)
+              tokenizer.save_pretrained(tokenizer_dir)
+              output = (Path('/workspace/results/wahm-generations') /
+                        os.environ['WAHM_OUTPUT_RUN'] / 'jais')
+              manifest_path = output / 'input_manifest.json'
+              manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+              manifest['tokenizer'] = {
+                  'source_revision': os.environ['WAHM_JAIS_REVISION'],
+                  'fix_mistral_regex': True,
+                  'derived_files': {
+                      path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                      for path in sorted(tokenizer_dir.iterdir()) if path.is_file()
+                  },
+              }
+              manifest_path.write_text(
+                  json.dumps(manifest, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8')
+              PY
               export HF_HUB_OFFLINE=1
               export TRANSFORMERS_OFFLINE=1
               python3 -m vllm.entrypoints.openai.api_server \
                 --model "${snapshot}" \
+                --tokenizer "${tokenizer_dir}" \
                 --served-model-name "${WAHM_JAIS_MODEL}" \
                 --host 127.0.0.1 \
                 --port 8000 \
@@ -195,12 +227,12 @@ spec:
           resources:
             requests:
               cpu: "4"
-              memory: 20Gi
+              memory: 32Gi
               ephemeral-storage: 25Gi
               nvidia.com/a100: "1"
             limits:
               cpu: "4"
-              memory: 20Gi
+              memory: 32Gi
               ephemeral-storage: 25Gi
               nvidia.com/a100: "1"
           volumeMounts:
