@@ -1,0 +1,43 @@
+{
+  "dialects": {
+    "egyptian": {
+      "rows": 300,
+      "source": "candidates_egyptian.csv",
+      "source_sha256": "209e77da721c0c1cfceadef1040d5e2f9094da4e9721a65d6ff0d93b79bdf2c5"
+    },
+    "gulf": {
+      "rows": 300,
+      "source": "candidates_gulf.csv",
+      "source_sha256": "82ef20782da17342a6bb3ecb5d5fd7d086b6e79f38a5cf262586e267d2628a34"
+    },
+    "levantine": {
+      "rows": 300,
+      "source": "candidates_levantine.csv",
+      "source_sha256": "cda549b37b20e35668501366629ca93aa48d856a905ffea564aa887208d4a5a0"
+    },
+    "sudanese": {
+      "rows": 300,
+      "source": "candidates_sudanese.csv",
+      "source_sha256": "70d5a4bb7540a1ccc7199351c573792a65d20fea2e277d90f15924975603ca11"
+    }
+  },
+  "generation_code_sha256": "348a49a717088199c79813e07161556a24f47c99b2c830234ed4e15fc6033368",
+  "input_commit": "c5347c904c73dea0ca08a9386bafd4d9206d48a4",
+  "model": {
+    "deployment": "gpt-5.5",
+    "deployment_type": "Global Standard",
+    "empty_response_retry_budgets": [
+      2048,
+      4096,
+      8192,
+      8192
+    ],
+    "interface": "openai_responses_v1",
+    "max_output_tokens": 2048,
+    "model_version": "2026-04-24",
+    "temperature": null,
+    "temperature_note": "Omitted because GPT-5.5 rejects the parameter.",
+    "workers": 8
+  },
+  "status": "provisional_unreviewed_candidates"
+}

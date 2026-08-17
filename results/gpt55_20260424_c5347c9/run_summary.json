@@ -1,0 +1,65 @@
+{
+  "combined": {
+    "clean": 1003,
+    "hallucinated": 497
+  },
+  "combined_by_variety": {
+    "egyptian": {
+      "clean": 204,
+      "hallucinated": 96
+    },
+    "gulf": {
+      "clean": 201,
+      "hallucinated": 99
+    },
+    "levantine": {
+      "clean": 199,
+      "hallucinated": 101
+    },
+    "msa": {
+      "clean": 206,
+      "hallucinated": 94
+    },
+    "sudanese": {
+      "clean": 193,
+      "hallucinated": 107
+    }
+  },
+  "files": {
+    "generations.csv": {
+      "bytes": 1162376,
+      "sha256": "59a6740705826f0cd070f9fd108ba39fb1499299e07fe5dd91c37276d13bbe03"
+    },
+    "input_manifest.json": {
+      "bytes": 1335,
+      "sha256": "5db0c15c97c7c26e0affc77e24991cf2c725cde979d26b551e4b012cc7ab99d1"
+    },
+    "scores_combined.csv": {
+      "bytes": 1205064,
+      "sha256": "6015888425e3c51a403f8a3315f624a7755b1d5df6253121c31a44f8a811c554"
+    },
+    "scores_layer1.csv": {
+      "bytes": 1182603,
+      "sha256": "fc1c99df18600b705bd45900ab332cb8f64a9c368fb0ffbee67a4afa363888f9"
+    }
+  },
+  "input_commit": "c5347c904c73dea0ca08a9386bafd4d9206d48a4",
+  "layer1": {
+    "clean": 594,
+    "defer": 677,
+    "hallucinated": 229
+  },
+  "layer2_run": "c234f9c79a394f1d415314217c93af1326f41e48",
+  "layer2_scored": 677,
+  "layer2_threshold": 0.5,
+  "layer2_weights_sha256": "57f2d72bad55cfebd521da993e1e38f5fd301bc9ac7a358c546d84ce80f3d81a",
+  "rows": 1500,
+  "rows_by_variety": {
+    "egyptian": 300,
+    "gulf": 300,
+    "levantine": 300,
+    "msa": 300,
+    "sudanese": 300
+  },
+  "run_id": "gpt55-20260424-c5347c9"
+}

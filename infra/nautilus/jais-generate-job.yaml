@@ -1,0 +1,266 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-jais-generate
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: jais-generate
+spec:
+  activeDeadlineSeconds: 86400
+  backoffLimit: 2
+  podFailurePolicy:
+    rules:
+      - action: Ignore
+        onPodConditions:
+          - type: DisruptionTarget
+            status: "True"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: jais-generate
+    spec:
+      priorityClassName: opportunistic
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 120
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - gp-engine.hpc.okstate.edu
+      containers:
+        - name: generate
+          image: vllm/vllm-openai:v0.27.1
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              repo="/workspace/repos/wahm-${WAHM_GIT_COMMIT}"
+              if [[ ! -s "${repo}/generate.py" ]]; then
+                python3 - <<'PY'
+              import io, os, shutil, tarfile, urllib.request
+              from pathlib import Path
+
+              commit = os.environ['WAHM_GIT_COMMIT']
+              url = f'https://github.com/cyberuniversal/Wahm/archive/{commit}.tar.gz'
+              repo = Path('/workspace/repos') / f'wahm-{commit}'
+              with urllib.request.urlopen(url, timeout=120) as response:
+                  archive = response.read()
+              temp = Path('/tmp/wahm-source')
+              if temp.exists():
+                  shutil.rmtree(temp)
+              temp.mkdir()
+              with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as source:
+                  source.extractall(temp, filter='data')
+              extracted = next(temp.iterdir())
+              repo.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copytree(extracted, repo, dirs_exist_ok=True)
+              print(f'extracted {commit} to {repo}')
+              PY
+              fi
+              python3 - <<'PY'
+              import csv, hashlib, json, os
+              from pathlib import Path
+
+              repo = Path('/workspace/repos') / ('wahm-' + os.environ['WAHM_GIT_COMMIT'])
+              manifest = {
+                  'status': 'provisional_unreviewed_candidates',
+                  'input_commit': os.environ['WAHM_GIT_COMMIT'],
+                  'dialects': {},
+              }
+              for dialect in ('gulf', 'egyptian', 'levantine', 'sudanese'):
+                  source = repo / f'candidates_{dialect}.csv'
+                  raw = source.read_bytes()
+                  rows = list(csv.DictReader(raw.decode('utf-8-sig').splitlines()))
+                  target = repo / f'final_{dialect}.csv'
+                  with target.open('w', encoding='utf-8', newline='') as stream:
+                      writer = csv.DictWriter(
+                          stream,
+                          fieldnames=['qid', 'question_dialect', 'gold_answer'])
+                      writer.writeheader()
+                      for row in rows:
+                          writer.writerow({
+                              'qid': row['qid'],
+                              'question_dialect': row['dialect_candidate'],
+                              'gold_answer': row['gold_answer'],
+                          })
+                  manifest['dialects'][dialect] = {
+                      'rows': len(rows),
+                      'source': source.name,
+                      'source_sha256': hashlib.sha256(raw).hexdigest(),
+                  }
+              output = (Path('/workspace/results/wahm-generations') /
+                        os.environ['WAHM_OUTPUT_RUN'] / 'jais')
+              output.mkdir(parents=True, exist_ok=True)
+              (output / 'input_manifest.json').write_text(
+                  json.dumps(manifest, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8')
+              PY
+              snapshot=$(python3 - <<'PY'
+              import os
+              from huggingface_hub import snapshot_download
+
+              print(snapshot_download(
+                  repo_id=os.environ['WAHM_JAIS_MODEL'],
+                  revision=os.environ['WAHM_JAIS_REVISION'],
+                  cache_dir='/workspace/model-cache-jais',
+                  token=os.environ['HF_TOKEN'],
+                  allow_patterns=[
+                      '*.json', '*.jinja', '*.safetensors', '*.py',
+                      'LICENSE*', 'README.md',
+                  ],
+              ))
+              PY
+              )
+              test -d "${snapshot}"
+              tokenizer_dir="/workspace/runtime/jais-tokenizer-${WAHM_JAIS_REVISION}"
+              export WAHM_JAIS_SNAPSHOT="${snapshot}"
+              export WAHM_JAIS_TOKENIZER_DIR="${tokenizer_dir}"
+              python3 - <<'PY'
+              import hashlib, json, os, shutil
+              from pathlib import Path
+              from transformers import AutoTokenizer
+
+              snapshot = Path(os.environ['WAHM_JAIS_SNAPSHOT'])
+              tokenizer_dir = Path(os.environ['WAHM_JAIS_TOKENIZER_DIR'])
+              if tokenizer_dir.exists():
+                  shutil.rmtree(tokenizer_dir)
+              tokenizer = AutoTokenizer.from_pretrained(
+                  snapshot, local_files_only=True, fix_mistral_regex=True)
+              tokenizer.save_pretrained(tokenizer_dir)
+              shutil.copy2(snapshot / 'config.json', tokenizer_dir / 'config.json')
+              output = (Path('/workspace/results/wahm-generations') /
+                        os.environ['WAHM_OUTPUT_RUN'] / 'jais')
+              manifest_path = output / 'input_manifest.json'
+              manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+              manifest['tokenizer'] = {
+                  'source_revision': os.environ['WAHM_JAIS_REVISION'],
+                  'fix_mistral_regex': True,
+                  'derived_files': {
+                      path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                      for path in sorted(tokenizer_dir.iterdir()) if path.is_file()
+                  },
+              }
+              manifest['inference_runtime'] = {
+                  'engine': 'vllm',
+                  'version': '0.27.1',
+                  'safetensors_load_strategy': 'prefetch',
+              }
+              manifest_path.write_text(
+                  json.dumps(manifest, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8')
+              PY
+              export HF_HUB_OFFLINE=1
+              export TRANSFORMERS_OFFLINE=1
+              python3 -m vllm.entrypoints.openai.api_server \
+                --model "${snapshot}" \
+                --tokenizer "${tokenizer_dir}" \
+                --served-model-name "${WAHM_JAIS_MODEL}" \
+                --host 127.0.0.1 \
+                --port 8000 \
+                --dtype bfloat16 \
+                --max-model-len 8192 \
+                --gpu-memory-utilization 0.90 \
+                --safetensors-load-strategy prefetch \
+                > /workspace/results/jais-vllm.log 2>&1 &
+              server_pid=$!
+              trap 'kill ${server_pid} 2>/dev/null || true' EXIT
+              python3 - <<'PY'
+              import time, urllib.request
+              for _ in range(1800):
+                  try:
+                      with urllib.request.urlopen('http://127.0.0.1:8000/health',
+                                                  timeout=2) as response:
+                          if response.status == 200:
+                              print('vLLM server ready')
+                              break
+                  except Exception:
+                      pass
+                  time.sleep(2)
+              else:
+                  raise SystemExit('vLLM server did not become ready')
+              PY
+              cd "${repo}"
+              python3 generate.py \
+                --models jais \
+                --varieties msa gulf egyptian levantine sudanese \
+                --conditions direct \
+                --temperature 0 \
+                --sleep 0
+              output="/workspace/results/wahm-generations/${WAHM_OUTPUT_RUN}/jais"
+              cp generations.csv "${output}/generations.csv"
+              python3 - <<'PY' | tee /dev/termination-log
+              import csv, hashlib, json, os
+              from collections import Counter
+              from pathlib import Path
+
+              path = (Path('/workspace/results/wahm-generations') /
+                      os.environ['WAHM_OUTPUT_RUN'] / 'jais/generations.csv')
+              raw = path.read_bytes()
+              rows = list(csv.DictReader(raw.decode('utf-8').splitlines()))
+              ok = [r for r in rows if r['answer'].strip() and not r['error'].strip()]
+              print(json.dumps({
+                  'output': str(path),
+                  'sha256': hashlib.sha256(raw).hexdigest(),
+                  'rows': len(rows),
+                  'successful': len(ok),
+                  'failed': len(rows) - len(ok),
+                  'successful_by_variety': dict(Counter(r['variety'] for r in ok)),
+                  'input_status': 'provisional_unreviewed_candidates',
+                  'model': os.environ['WAHM_JAIS_MODEL'],
+                  'model_revision': os.environ['WAHM_JAIS_REVISION'],
+              }, sort_keys=True))
+              PY
+          env:
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/cyberuniversal/Wahm.git
+            - name: WAHM_GIT_COMMIT
+              value: __WAHM_GIT_COMMIT__
+            - name: WAHM_OUTPUT_RUN
+              value: jais2-f7df1cb-__WAHM_GIT_SHORT__
+            - name: WAHM_JAIS_MODEL
+              value: inceptionai/Jais-2-8B-Chat
+            - name: WAHM_JAIS_REVISION
+              value: f7df1cb035424ed345b5ee2b04f114721c8951f2
+            - name: JAIS_DEPLOYMENT
+              value: inceptionai/Jais-2-8B-Chat
+            - name: JAIS_BASE_URL
+              value: http://127.0.0.1:8000/v1
+            - name: JAIS_API_KEY
+              value: local-vllm-no-auth
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: wahm-hf-token
+                  key: token
+            - name: HF_HOME
+              value: /workspace/model-cache-jais
+          resources:
+            requests:
+              cpu: "4"
+              memory: 32Gi
+              ephemeral-storage: 25Gi
+              nvidia.com/a100: "1"
+            limits:
+              cpu: "4"
+              memory: 32Gi
+              ephemeral-storage: 25Gi
+              nvidia.com/a100: "1"
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: wahm-allam-539948
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 8Gi

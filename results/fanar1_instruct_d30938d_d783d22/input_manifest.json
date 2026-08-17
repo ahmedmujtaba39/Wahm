@@ -1,0 +1,32 @@
+{
+  "dialects": {
+    "egyptian": {
+      "rows": 300,
+      "source": "candidates_egyptian.csv",
+      "source_sha256": "209e77da721c0c1cfceadef1040d5e2f9094da4e9721a65d6ff0d93b79bdf2c5"
+    },
+    "gulf": {
+      "rows": 300,
+      "source": "candidates_gulf.csv",
+      "source_sha256": "82ef20782da17342a6bb3ecb5d5fd7d086b6e79f38a5cf262586e267d2628a34"
+    },
+    "levantine": {
+      "rows": 300,
+      "source": "candidates_levantine.csv",
+      "source_sha256": "cda549b37b20e35668501366629ca93aa48d856a905ffea564aa887208d4a5a0"
+    },
+    "sudanese": {
+      "rows": 300,
+      "source": "candidates_sudanese.csv",
+      "source_sha256": "70d5a4bb7540a1ccc7199351c573792a65d20fea2e277d90f15924975603ca11"
+    }
+  },
+  "input_commit": "d783d22f4da4cf2880457c1a2a8c640ad1b98104",
+  "model": {
+    "id": "QCRI/Fanar-1-9B-Instruct",
+    "interface": "openai_chat_completions",
+    "revision": "d30938d0efb1fd251727ee96df6987802ff84662",
+    "temperature": 0.0
+  },
+  "status": "provisional_unreviewed_candidates"
+}

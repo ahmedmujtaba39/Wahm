@@ -37,12 +37,12 @@ Usage
 """
 
 import argparse, csv, os, sys, time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------- model registry
-# All entries speak the OpenAI chat-completions schema. If Fanar or ALLaM turn
-# out not to, only `call_openai_compatible` needs a sibling function; the rest
-# of the script is provider-agnostic.
+# Entries use either the OpenAI chat-completions or completions schema. The
+# latter is needed for base checkpoints that do not define a chat template.
 MODELS = {
     "gpt4o": dict(
         model_id="gpt-4o",
@@ -50,17 +50,34 @@ MODELS = {
         key_env="OPENAI_API_KEY",
         family="multilingual",
     ),
+    "gpt55": dict(
+        model_id=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-5.5"),
+        base_url_env="AZURE_OPENAI_BASE_URL",
+        key_env="AZURE_OPENAI_API_KEY",
+        family="multilingual",
+        api_mode="responses",
+        supports_temperature=False,
+        max_output_tokens=2048,
+        max_output_tokens_cap=8192,
+    ),
     "allam": dict(
         model_id=os.getenv("ALLAM_DEPLOYMENT", "allam-2-7b"),
         base_url_env="AZURE_ALLAM_ENDPOINT",  # Azure AI Foundry endpoint
         key_env="AZURE_ALLAM_KEY",
         family="arabic_centric",
     ),
+    "jais": dict(
+        model_id=os.getenv("JAIS_DEPLOYMENT", "inceptionai/Jais-2-8B-Chat"),
+        base_url_env="JAIS_BASE_URL",
+        key_env="JAIS_API_KEY",
+        family="arabic_centric",
+    ),
     "fanar": dict(
-        model_id=os.getenv("FANAR_MODEL", "Fanar"),
+        model_id=os.getenv("FANAR_MODEL", "QCRI/Fanar-1-9B"),
         base_url_env="FANAR_BASE_URL",        # from your approved QCRI API access
         key_env="FANAR_API_KEY",
         family="arabic_centric",
+        api_mode=os.getenv("FANAR_API_MODE", "chat"),
     ),
     "falcon": dict(
         model_id="tiiuae/falcon-h1-34b-instruct",
@@ -131,10 +148,37 @@ def _chat(name, messages, temperature, max_tokens=512, retries=4):
     client = get_client(name)
     for attempt in range(retries):
         try:
-            r = client.chat.completions.create(
-                model=spec["model_id"], messages=messages,
-                temperature=temperature, max_tokens=max_tokens)
-            return ((r.choices[0].message.content or "").strip(), "",
+            api_mode = spec.get("api_mode", "chat")
+            if api_mode == "completion":
+                prompt = "\n\n".join(message["content"] for message in messages)
+                r = client.completions.create(
+                    model=spec["model_id"], prompt=prompt,
+                    temperature=temperature, max_tokens=max_tokens)
+                answer = r.choices[0].text
+            elif api_mode == "responses":
+                base_output_tokens = spec.get("max_output_tokens", max_tokens)
+                kwargs = dict(
+                    model=spec["model_id"], input=messages,
+                    max_output_tokens=min(
+                        base_output_tokens * (2 ** attempt),
+                        spec.get("max_output_tokens_cap", base_output_tokens)))
+                if spec.get("supports_temperature", True):
+                    kwargs["temperature"] = temperature
+                r = client.responses.create(**kwargs)
+                answer = r.output_text
+                if not answer:
+                    status = getattr(r, "status", "unknown")
+                    reason = getattr(
+                        getattr(r, "incomplete_details", None), "reason",
+                        "empty_output")
+                    raise RuntimeError(
+                        f"empty response: status={status}, reason={reason}")
+            else:
+                r = client.chat.completions.create(
+                    model=spec["model_id"], messages=messages,
+                    temperature=temperature, max_tokens=max_tokens)
+                answer = r.choices[0].message.content
+            return ((answer or "").strip(), "",
                     getattr(r, "model", spec["model_id"]))
         except Exception as e:
             if attempt == retries - 1:
@@ -218,7 +262,7 @@ def load_done():
 
 
 # ---------------------------------------------------------------- main loop
-def run(models, varieties, conditions, limit, temperature, sleep):
+def run(models, varieties, conditions, limit, temperature, sleep, workers=1):
     items = load_benchmark(varieties, limit)
     if not items:
         sys.exit("ERROR: no benchmark items loaded")
@@ -235,6 +279,7 @@ def run(models, varieties, conditions, limit, temperature, sleep):
     print(f"models          : {', '.join(models)}")
     print(f"varieties       : {', '.join(varieties)}")
     print(f"conditions      : {', '.join(conditions)}")
+    print(f"workers         : {workers}")
     print(f"already done    : {len(done)}")
     print(f"to generate     : {len(todo)}\n")
     if not todo:
@@ -253,26 +298,47 @@ def run(models, varieties, conditions, limit, temperature, sleep):
         if new_file:
             w.writeheader()
 
-        errors = 0
-        for i, (qid, variety, question, gold, condition, model) in enumerate(todo, 1):
-            answer, err, pivot, resolved_model, pivot_model = generate_one(
-                model, question, variety, condition, temperature)
-            if err:
-                errors += 1
-            w.writerow(dict(
-                qid=qid, variety=variety, condition=condition, model=model,
-                family=MODELS[model]["family"], question=question,
-                gold_answer=gold, answer=answer, pivot_question=pivot,
-                model_id=MODELS[model]["model_id"], temperature=temperature,
-                resolved_model_id=resolved_model, pivot_model_id=pivot_model,
-                timestamp=datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                error=err))
-            f.flush()
+        def generate_task(task):
+            qid, variety, question, gold, condition, model = task
+            result = generate_one(model, question, variety, condition, temperature)
+            return task, result
 
-            if i % 25 == 0 or i == len(todo):
-                print(f"  {i}/{len(todo)}  (errors: {errors})")
-            if sleep:
-                time.sleep(sleep)
+        executor = None
+        if workers > 1:
+            # Initialize clients before worker threads to avoid creation races.
+            for model in models:
+                get_client(model)
+            executor = ThreadPoolExecutor(max_workers=workers)
+            generated = executor.map(generate_task, todo)
+        else:
+            generated = map(generate_task, todo)
+
+        errors = 0
+        try:
+            for i, (task, result) in enumerate(generated, 1):
+                qid, variety, question, gold, condition, model = task
+                answer, err, pivot, resolved_model, pivot_model = result
+                if err:
+                    errors += 1
+                w.writerow(dict(
+                    qid=qid, variety=variety, condition=condition, model=model,
+                    family=MODELS[model]["family"], question=question,
+                    gold_answer=gold, answer=answer, pivot_question=pivot,
+                    model_id=MODELS[model]["model_id"],
+                    temperature=(temperature if MODELS[model].get(
+                        "supports_temperature", True) else ""),
+                    resolved_model_id=resolved_model, pivot_model_id=pivot_model,
+                    timestamp=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                    error=err))
+                f.flush()
+
+                if i % 25 == 0 or i == len(todo):
+                    print(f"  {i}/{len(todo)}  (errors: {errors})")
+                if sleep:
+                    time.sleep(sleep)
+        finally:
+            if executor is not None:
+                executor.shutdown(wait=True)
 
     print(f"\nwrote {OUT}")
     if errors:
@@ -291,9 +357,12 @@ if __name__ == "__main__":
                    help="first N questions per variety (use 20 for a pilot)")
     p.add_argument("--temperature", type=float, default=0.0)
     p.add_argument("--sleep", type=float, default=0.0, help="pause between calls")
+    p.add_argument("--workers", type=int, default=1,
+                   help="concurrent requests (use only with providers that allow it)")
     a = p.parse_args()
 
     models = list(MODELS) if a.all else (a.models or ["gpt4o"])
     varieties = VARIETIES if a.all else (a.varieties or ["msa"])
 
-    run(models, varieties, a.conditions, a.limit, a.temperature, a.sleep)
+    run(models, varieties, a.conditions, a.limit, a.temperature, a.sleep,
+        a.workers)

@@ -135,6 +135,81 @@ class TranslationTests(unittest.TestCase):
 
 
 class GenerationTests(unittest.TestCase):
+    def test_responses_model_omits_unsupported_temperature(self):
+        class Responses:
+            def create(self, **kwargs):
+                from types import SimpleNamespace
+                self.kwargs = kwargs
+                return SimpleNamespace(
+                    model="gpt-5.5-2026-04-24", output_text="الدوحة")
+
+        from types import SimpleNamespace
+        responses = Responses()
+        generate._clients["gpt55"] = SimpleNamespace(responses=responses)
+        try:
+            answer, error, pivot, resolved, pivot_model = generate.generate_one(
+                "gpt55", "ما هي عاصمة قطر؟", "msa", "direct", 0.0)
+        finally:
+            generate._clients.clear()
+        self.assertEqual(error, "")
+        self.assertEqual((answer, resolved),
+                         ("الدوحة", "gpt-5.5-2026-04-24"))
+        self.assertEqual(responses.kwargs["input"], [
+            {"role": "user", "content": "ما هي عاصمة قطر؟"}])
+        self.assertEqual(responses.kwargs["max_output_tokens"], 2048)
+        self.assertNotIn("temperature", responses.kwargs)
+
+    def test_responses_model_retries_empty_payload(self):
+        class Responses:
+            calls = 0
+            budgets = []
+
+            def create(self, **kwargs):
+                from types import SimpleNamespace
+                self.calls += 1
+                self.budgets.append(kwargs["max_output_tokens"])
+                return SimpleNamespace(
+                    model="gpt-5.5-2026-04-24",
+                    output_text="" if self.calls == 1 else "إجابة",
+                    status="completed",
+                    incomplete_details=None)
+
+        from types import SimpleNamespace
+        responses = Responses()
+        generate._clients["gpt55"] = SimpleNamespace(responses=responses)
+        try:
+            answer, error, _, _, _ = generate.generate_one(
+                "gpt55", "سؤال", "msa", "direct", 0.0)
+        finally:
+            generate._clients.clear()
+        self.assertEqual((answer, error), ("إجابة", ""))
+        self.assertEqual(responses.calls, 2)
+        self.assertEqual(responses.budgets, [2048, 4096])
+
+    def test_base_model_uses_text_completion_endpoint(self):
+        class Completions:
+            def create(self, **kwargs):
+                from types import SimpleNamespace
+                self.kwargs = kwargs
+                return SimpleNamespace(
+                    model="resolved-fanar",
+                    choices=[SimpleNamespace(text="الدوحة")])
+
+        from types import SimpleNamespace
+        completions = Completions()
+        generate._clients["fanar"] = SimpleNamespace(completions=completions)
+        old_mode = generate.MODELS["fanar"]["api_mode"]
+        generate.MODELS["fanar"]["api_mode"] = "completion"
+        try:
+            answer, error, pivot, resolved, pivot_model = generate.generate_one(
+                "fanar", "ما هي عاصمة قطر؟", "msa", "direct", 0.0)
+        finally:
+            generate.MODELS["fanar"]["api_mode"] = old_mode
+            generate._clients.clear()
+        self.assertEqual(error, "")
+        self.assertEqual((answer, resolved), ("الدوحة", "resolved-fanar"))
+        self.assertEqual(completions.kwargs["prompt"], "ما هي عاصمة قطر؟")
+
     def test_msa_pivot_records_both_resolved_models(self):
         class Completions:
             calls = 0

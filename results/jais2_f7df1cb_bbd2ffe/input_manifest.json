@@ -1,0 +1,41 @@
+{
+  "dialects": {
+    "egyptian": {
+      "rows": 300,
+      "source": "candidates_egyptian.csv",
+      "source_sha256": "209e77da721c0c1cfceadef1040d5e2f9094da4e9721a65d6ff0d93b79bdf2c5"
+    },
+    "gulf": {
+      "rows": 300,
+      "source": "candidates_gulf.csv",
+      "source_sha256": "82ef20782da17342a6bb3ecb5d5fd7d086b6e79f38a5cf262586e267d2628a34"
+    },
+    "levantine": {
+      "rows": 300,
+      "source": "candidates_levantine.csv",
+      "source_sha256": "cda549b37b20e35668501366629ca93aa48d856a905ffea564aa887208d4a5a0"
+    },
+    "sudanese": {
+      "rows": 300,
+      "source": "candidates_sudanese.csv",
+      "source_sha256": "70d5a4bb7540a1ccc7199351c573792a65d20fea2e277d90f15924975603ca11"
+    }
+  },
+  "inference_runtime": {
+    "engine": "vllm",
+    "safetensors_load_strategy": "prefetch",
+    "version": "0.27.1"
+  },
+  "input_commit": "bbd2ffeb43bd7f4aeeeab46ca5b3de5ad30da9c8",
+  "status": "provisional_unreviewed_candidates",
+  "tokenizer": {
+    "derived_files": {
+      "chat_template.jinja": "697d5d91dc3adc0f233098c7dd537a0467be0f2419779ad9bd5156f66761aa9a",
+      "config.json": "6f5a76acaf073b6460f0348ddae5b32cd5098fbd0d298a95e39a155c3c112b71",
+      "tokenizer.json": "66f871e68e51e233c3689ead99b9b1b23be84689e7ab1541640b57070db95d74",
+      "tokenizer_config.json": "f8e1423bc68cff3c9ebdf566f1fcdb7a8b7e100f627922660f655f64de385504"
+    },
+    "fix_mistral_regex": true,
+    "source_revision": "f7df1cb035424ed345b5ee2b04f114721c8951f2"
+  }
+}
