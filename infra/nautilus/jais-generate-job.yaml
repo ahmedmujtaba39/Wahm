@@ -133,6 +133,7 @@ spec:
               tokenizer = AutoTokenizer.from_pretrained(
                   snapshot, local_files_only=True, fix_mistral_regex=True)
               tokenizer.save_pretrained(tokenizer_dir)
+              shutil.copy2(snapshot / 'config.json', tokenizer_dir / 'config.json')
               output = (Path('/workspace/results/wahm-generations') /
                         os.environ['WAHM_OUTPUT_RUN'] / 'jais')
               manifest_path = output / 'input_manifest.json'
@@ -144,6 +145,11 @@ spec:
                       path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                       for path in sorted(tokenizer_dir.iterdir()) if path.is_file()
                   },
+              }
+              manifest['inference_runtime'] = {
+                  'engine': 'vllm',
+                  'version': '0.27.1',
+                  'safetensors_load_strategy': 'prefetch',
               }
               manifest_path.write_text(
                   json.dumps(manifest, indent=2, sort_keys=True) + '\n',
@@ -160,6 +166,7 @@ spec:
                 --dtype bfloat16 \
                 --max-model-len 8192 \
                 --gpu-memory-utilization 0.90 \
+                --safetensors-load-strategy prefetch \
                 > /workspace/results/jais-vllm.log 2>&1 &
               server_pid=$!
               trap 'kill ${server_pid} 2>/dev/null || true' EXIT
