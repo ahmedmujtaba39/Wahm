@@ -1,0 +1,151 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-fanar-instruct-score
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: fanar-instruct-score
+spec:
+  activeDeadlineSeconds: 7200
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: fanar-instruct-score
+    spec:
+      restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - gp-engine.hpc.okstate.edu
+                      - uicnrp-fiona2.evl.uic.edu
+      containers:
+        - name: score
+          image: pytorch/pytorch:2.7.1-cuda11.8-cudnn9-runtime
+          command: ["/bin/bash", "-lc"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update
+              apt-get install -y --no-install-recommends git ca-certificates
+              rm -rf /var/lib/apt/lists/*
+              git clone "${WAHM_GIT_REPOSITORY}" /tmp/wahm
+              git -C /tmp/wahm checkout --detach "${WAHM_GIT_COMMIT}"
+              python -m pip install --no-cache-dir -r /tmp/wahm/requirements-judge.txt
+              run_dir="/results/results/wahm-generations/${WAHM_RUN_ID}/fanar"
+              model_dir="/models/results/wahm-layer2/${WAHM_LAYER2_RUN}/arabert_judge_gold_answer"
+              test -s "${run_dir}/generations.csv"
+              test -s "${model_dir}/model.safetensors"
+              cd /tmp/wahm
+              python score_layer1.py \
+                --input "${run_dir}/generations.csv" \
+                --output "${run_dir}/scores_layer1.csv"
+              python score_layer2.py \
+                --input "${run_dir}/scores_layer1.csv" \
+                --model "${model_dir}" \
+                --output "${run_dir}/scores_combined.csv" \
+                --threshold "${WAHM_LAYER2_THRESHOLD}" \
+                --batch-size 32
+              python - <<'PY' | tee /dev/termination-log
+              import csv, hashlib, json, os
+              from collections import Counter
+              from pathlib import Path
+
+              run_dir = (Path('/results/results/wahm-generations') /
+                         os.environ['WAHM_RUN_ID'] / 'fanar')
+              rows = list(csv.DictReader(
+                  (run_dir / 'scores_combined.csv').open(encoding='utf-8')))
+              counts = Counter(r['variety'] for r in rows)
+              expected = Counter({
+                  'msa': 300, 'gulf': 300, 'egyptian': 300,
+                  'levantine': 300, 'sudanese': 300})
+              if len(rows) != 1500 or counts != expected:
+                  raise SystemExit(f'unexpected evaluation rows: {len(rows)} {counts}')
+              if any(not r['answer'].strip() or r['error'].strip() for r in rows):
+                  raise SystemExit('blank answer or generation error found')
+              deferred = sum(
+                  r['layer1_decision'].strip().lower() == 'defer' for r in rows)
+              layer2_scored = sum(bool(r['layer2_hallucination_probability'])
+                                  for r in rows)
+              if deferred != layer2_scored:
+                  raise SystemExit(
+                      f'Layer 2 coverage mismatch: {deferred=} {layer2_scored=}')
+              summary = {
+                  'run_id': os.environ['WAHM_RUN_ID'],
+                  'input_commit': os.environ['WAHM_GIT_COMMIT'],
+                  'rows': len(rows),
+                  'rows_by_variety': dict(sorted(counts.items())),
+                  'layer1': dict(Counter(r['layer1_decision'] for r in rows)),
+                  'combined': dict(Counter(r['combined_decision'] for r in rows)),
+                  'combined_by_variety': {
+                      variety: dict(Counter(
+                          r['combined_decision'] for r in rows
+                          if r['variety'] == variety))
+                      for variety in sorted(counts)
+                  },
+                  'layer2_scored': layer2_scored,
+                  'layer2_threshold': float(os.environ['WAHM_LAYER2_THRESHOLD']),
+                  'layer2_run': os.environ['WAHM_LAYER2_RUN'],
+                  'layer2_weights_sha256': os.environ['WAHM_LAYER2_WEIGHTS_SHA256'],
+                  'files': {},
+              }
+              for artifact in ('generations.csv', 'scores_layer1.csv',
+                               'scores_combined.csv', 'input_manifest.json'):
+                  path = run_dir / artifact
+                  raw = path.read_bytes()
+                  summary['files'][artifact] = {
+                      'bytes': len(raw),
+                      'sha256': hashlib.sha256(raw).hexdigest(),
+                  }
+              (run_dir / 'run_summary.json').write_text(
+                  json.dumps(summary, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8')
+              print(json.dumps(summary, sort_keys=True))
+              PY
+          env:
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/cyberuniversal/Wahm.git
+            - name: WAHM_GIT_COMMIT
+              value: d783d22f4da4cf2880457c1a2a8c640ad1b98104
+            - name: WAHM_RUN_ID
+              value: fanar1-instruct-d30938d-d783d22
+            - name: WAHM_LAYER2_RUN
+              value: c234f9c79a394f1d415314217c93af1326f41e48
+            - name: WAHM_LAYER2_THRESHOLD
+              value: "0.5"
+            - name: WAHM_LAYER2_WEIGHTS_SHA256
+              value: 57f2d72bad55cfebd521da993e1e38f5fd301bc9ac7a358c546d84ce80f3d81a
+            - name: TOKENIZERS_PARALLELISM
+              value: "false"
+            - name: WANDB_DISABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: "2"
+              memory: 8Gi
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "2"
+              memory: 8Gi
+              nvidia.com/gpu: "1"
+          volumeMounts:
+            - name: results
+              mountPath: /results
+            - name: layer2
+              mountPath: /models
+              readOnly: true
+      volumes:
+        - name: results
+          persistentVolumeClaim:
+            claimName: wahm-allam-539948
+        - name: layer2
+          persistentVolumeClaim:
+            claimName: wahm-layer2-final-539948
+            readOnly: true
