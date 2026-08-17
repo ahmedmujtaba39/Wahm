@@ -99,7 +99,7 @@ spec:
               print(snapshot_download(
                   repo_id=os.environ['WAHM_JAIS_MODEL'],
                   revision=os.environ['WAHM_JAIS_REVISION'],
-                  cache_dir='/model-cache',
+                  cache_dir='/workspace/model-cache-jais',
                   token=os.environ['HF_TOKEN'],
                   allow_patterns=[
                       '*.json', '*.jinja', '*.safetensors', '*.py',
@@ -191,9 +191,7 @@ spec:
                   name: wahm-hf-token
                   key: token
             - name: HF_HOME
-              value: /model-cache
-            - name: HF_HUB_DISABLE_XET
-              value: "1"
+              value: /workspace/model-cache-jais
           resources:
             requests:
               cpu: "4"
@@ -210,8 +208,6 @@ spec:
               mountPath: /workspace
             - name: dshm
               mountPath: /dev/shm
-            - name: model-cache
-              mountPath: /model-cache
       volumes:
         - name: workspace
           persistentVolumeClaim:
@@ -220,6 +216,3 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 8Gi
-        - name: model-cache
-          emptyDir:
-            sizeLimit: 25Gi
