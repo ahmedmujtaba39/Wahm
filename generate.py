@@ -50,6 +50,16 @@ MODELS = {
         key_env="OPENAI_API_KEY",
         family="multilingual",
     ),
+    "gpt55": dict(
+        model_id=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-5.5"),
+        base_url_env="AZURE_OPENAI_BASE_URL",
+        key_env="AZURE_OPENAI_API_KEY",
+        family="multilingual",
+        api_mode="responses",
+        supports_temperature=False,
+        max_output_tokens=2048,
+        max_output_tokens_cap=8192,
+    ),
     "allam": dict(
         model_id=os.getenv("ALLAM_DEPLOYMENT", "allam-2-7b"),
         base_url_env="AZURE_ALLAM_ENDPOINT",  # Azure AI Foundry endpoint
@@ -138,12 +148,31 @@ def _chat(name, messages, temperature, max_tokens=512, retries=4):
     client = get_client(name)
     for attempt in range(retries):
         try:
-            if spec.get("api_mode", "chat") == "completion":
+            api_mode = spec.get("api_mode", "chat")
+            if api_mode == "completion":
                 prompt = "\n\n".join(message["content"] for message in messages)
                 r = client.completions.create(
                     model=spec["model_id"], prompt=prompt,
                     temperature=temperature, max_tokens=max_tokens)
                 answer = r.choices[0].text
+            elif api_mode == "responses":
+                base_output_tokens = spec.get("max_output_tokens", max_tokens)
+                kwargs = dict(
+                    model=spec["model_id"], input=messages,
+                    max_output_tokens=min(
+                        base_output_tokens * (2 ** attempt),
+                        spec.get("max_output_tokens_cap", base_output_tokens)))
+                if spec.get("supports_temperature", True):
+                    kwargs["temperature"] = temperature
+                r = client.responses.create(**kwargs)
+                answer = r.output_text
+                if not answer:
+                    status = getattr(r, "status", "unknown")
+                    reason = getattr(
+                        getattr(r, "incomplete_details", None), "reason",
+                        "empty_output")
+                    raise RuntimeError(
+                        f"empty response: status={status}, reason={reason}")
             else:
                 r = client.chat.completions.create(
                     model=spec["model_id"], messages=messages,
@@ -295,7 +324,9 @@ def run(models, varieties, conditions, limit, temperature, sleep, workers=1):
                     qid=qid, variety=variety, condition=condition, model=model,
                     family=MODELS[model]["family"], question=question,
                     gold_answer=gold, answer=answer, pivot_question=pivot,
-                    model_id=MODELS[model]["model_id"], temperature=temperature,
+                    model_id=MODELS[model]["model_id"],
+                    temperature=(temperature if MODELS[model].get(
+                        "supports_temperature", True) else ""),
                     resolved_model_id=resolved_model, pivot_model_id=pivot_model,
                     timestamp=datetime.now(timezone.utc).isoformat(timespec="seconds"),
                     error=err))
