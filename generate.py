@@ -56,6 +56,12 @@ MODELS = {
         key_env="AZURE_ALLAM_KEY",
         family="arabic_centric",
     ),
+    "jais": dict(
+        model_id=os.getenv("JAIS_DEPLOYMENT", "inceptionai/Jais-2-8B-Chat"),
+        base_url_env="JAIS_BASE_URL",
+        key_env="JAIS_API_KEY",
+        family="arabic_centric",
+    ),
     "fanar": dict(
         model_id=os.getenv("FANAR_MODEL", "Fanar"),
         base_url_env="FANAR_BASE_URL",        # from your approved QCRI API access
