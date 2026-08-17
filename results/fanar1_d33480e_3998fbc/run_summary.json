@@ -1,0 +1,65 @@
+{
+  "combined": {
+    "clean": 264,
+    "hallucinated": 1236
+  },
+  "combined_by_variety": {
+    "egyptian": {
+      "clean": 44,
+      "hallucinated": 256
+    },
+    "gulf": {
+      "clean": 57,
+      "hallucinated": 243
+    },
+    "levantine": {
+      "clean": 72,
+      "hallucinated": 228
+    },
+    "msa": {
+      "clean": 58,
+      "hallucinated": 242
+    },
+    "sudanese": {
+      "clean": 33,
+      "hallucinated": 267
+    }
+  },
+  "files": {
+    "generations.csv": {
+      "bytes": 4026833,
+      "sha256": "3436b42f287cfa4f7f0e3bd387b00bf5716248accbb30cd43c4cb76a16494624"
+    },
+    "input_manifest.json": {
+      "bytes": 1005,
+      "sha256": "aa6e09a5c7a02ef9fa3c40a3c078fed28be63b369a1e9c4de8c44933554d02d6"
+    },
+    "scores_combined.csv": {
+      "bytes": 4080438,
+      "sha256": "5b07e6082e9a1a760693b6f1b2aa21e4f3bb43df80af1e510e55a2dd8140f99f"
+    },
+    "scores_layer1.csv": {
+      "bytes": 4054532,
+      "sha256": "bfd6f40773f97fcd27c09aa1b9ba199900baf655ddb5493d372932496648e01e"
+    }
+  },
+  "input_commit": "3998fbce19f7c6ce2cc638ab9abf31978773da08",
+  "layer1": {
+    "clean": 97,
+    "defer": 461,
+    "hallucinated": 942
+  },
+  "layer2_run": "c234f9c79a394f1d415314217c93af1326f41e48",
+  "layer2_scored": 461,
+  "layer2_threshold": 0.5,
+  "layer2_weights_sha256": "57f2d72bad55cfebd521da993e1e38f5fd301bc9ac7a358c546d84ce80f3d81a",
+  "rows": 1500,
+  "rows_by_variety": {
+    "egyptian": 300,
+    "gulf": 300,
+    "levantine": 300,
+    "msa": 300,
+    "sudanese": 300
+  },
+  "run_id": "fanar1-d33480e-3998fbc"
+}
