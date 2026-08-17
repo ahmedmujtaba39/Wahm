@@ -16,6 +16,16 @@ spec:
         wahm/stage: jais-score
     spec:
       restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - gp-engine.hpc.okstate.edu
+                      - uicnrp-fiona2.evl.uic.edu
       containers:
         - name: score
           image: pytorch/pytorch:2.7.1-cuda11.8-cudnn9-runtime
