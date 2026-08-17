@@ -32,11 +32,28 @@ spec:
             - |
               set -euo pipefail
               repo="/workspace/repos/wahm-${WAHM_GIT_COMMIT}"
-              if [[ ! -d "${repo}/.git" ]]; then
-                git clone "${WAHM_GIT_REPOSITORY}" "${repo}"
+              if [[ ! -s "${repo}/generate.py" ]]; then
+                python3 - <<'PY'
+              import io, os, shutil, tarfile, urllib.request
+              from pathlib import Path
+
+              commit = os.environ['WAHM_GIT_COMMIT']
+              url = f'https://github.com/cyberuniversal/Wahm/archive/{commit}.tar.gz'
+              repo = Path('/workspace/repos') / f'wahm-{commit}'
+              with urllib.request.urlopen(url, timeout=120) as response:
+                  archive = response.read()
+              temp = Path('/tmp/wahm-source')
+              if temp.exists():
+                  shutil.rmtree(temp)
+              temp.mkdir()
+              with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as source:
+                  source.extractall(temp, filter='data')
+              extracted = next(temp.iterdir())
+              repo.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copytree(extracted, repo, dirs_exist_ok=True)
+              print(f'extracted {commit} to {repo}')
+              PY
               fi
-              git -C "${repo}" fetch origin
-              git -C "${repo}" checkout --detach "${WAHM_GIT_COMMIT}"
               python3 - <<'PY'
               import csv, hashlib, json, os
               from pathlib import Path
