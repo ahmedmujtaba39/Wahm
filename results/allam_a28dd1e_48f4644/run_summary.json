@@ -1,0 +1,40 @@
+{
+  "model": "humain-ai/ALLaM-7B-Instruct-preview",
+  "model_revision": "a28dd1e67420cde72d3629c8633a974cf7d9c366",
+  "input_commit": "48f46446967841275c95af4e31a5ae8069b1ac4a",
+  "input_status": "provisional_unreviewed_candidates",
+  "condition": "direct",
+  "temperature": 0.0,
+  "generation_rows": 1500,
+  "generation_failures": 0,
+  "rows_per_variety": 300,
+  "layer1": {
+    "clean": 383,
+    "hallucinated": 393,
+    "defer": 724
+  },
+  "layer2": {
+    "variant": "gold_answer",
+    "checkpoint_run": "c234f9c79a394f1d415314217c93af1326f41e48",
+    "weights_sha256": "57f2d72bad55cfebd521da993e1e38f5fd301bc9ac7a358c546d84ce80f3d81a",
+    "threshold": 0.5,
+    "scored_rows": 724
+  },
+  "combined": {
+    "clean": 918,
+    "hallucinated": 582,
+    "by_variety": {
+      "msa": {"clean": 187, "hallucinated": 113},
+      "gulf": {"clean": 183, "hallucinated": 117},
+      "egyptian": {"clean": 188, "hallucinated": 112},
+      "levantine": {"clean": 188, "hallucinated": 112},
+      "sudanese": {"clean": 172, "hallucinated": 128}
+    }
+  },
+  "sha256": {
+    "generations.csv": "d66424757a555918cc4777d3942c6e25ba80188b40132ab4a7a04ad33c184ebc",
+    "input_manifest.json": "8b87b2373a38b47aa3723ee3d0f3e3d625320034ba4f654226a3b524d2789f07",
+    "scores_layer1.csv": "c5f49ee0c9fc4c6e0c268bdfaa49924bef253b79610cece51cc582b7845c59e6",
+    "scores_combined.csv": "968451921c3429f2b8aa8f6bd13215c9a3dbdb8327664cbfe906835197386268"
+  }
+}
