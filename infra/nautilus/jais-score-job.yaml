@@ -70,7 +70,8 @@ spec:
                   raise SystemExit(f'unexpected evaluation rows: {len(rows)} {counts}')
               if any(not r['answer'].strip() or r['error'].strip() for r in rows):
                   raise SystemExit('blank answer or generation error found')
-              deferred = sum(r['layer1_decision'] == 'DEFER' for r in rows)
+              deferred = sum(
+                  r['layer1_decision'].strip().lower() == 'defer' for r in rows)
               layer2_scored = sum(bool(r['layer2_hallucination_probability'])
                                   for r in rows)
               if deferred != layer2_scored:
