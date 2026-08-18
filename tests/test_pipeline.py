@@ -143,6 +143,29 @@ class GenerationTests(unittest.TestCase):
         self.assertEqual(generate.MODELS["gemma-2-9b"]["model_id"],
                          "google/gemma-2-9b-it")
 
+    def test_qwen3_disables_thinking_mode(self):
+        class Completions:
+            def create(self, **kwargs):
+                from types import SimpleNamespace
+                self.kwargs = kwargs
+                return SimpleNamespace(
+                    model="Qwen/Qwen3-8B",
+                    choices=[SimpleNamespace(
+                        message=SimpleNamespace(content="الدوحة"))])
+
+        from types import SimpleNamespace
+        completions = Completions()
+        generate._clients["qwen3-8b"] = SimpleNamespace(
+            chat=SimpleNamespace(completions=completions))
+        try:
+            answer, error, _, _, _ = generate.generate_one(
+                "qwen3-8b", "ما هي عاصمة قطر؟", "msa", "direct", 0.0)
+        finally:
+            generate._clients.clear()
+        self.assertEqual((answer, error), ("الدوحة", ""))
+        self.assertEqual(completions.kwargs["extra_body"], {
+            "chat_template_kwargs": {"enable_thinking": False}})
+
     def test_responses_model_omits_unsupported_temperature(self):
         class Responses:
             def create(self, **kwargs):
