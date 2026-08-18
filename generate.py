@@ -91,6 +91,29 @@ MODELS = {
         key_env="OPENROUTER_API_KEY",
         family="multilingual",
     ),
+    "qwen3-8b": dict(
+        model_id=os.getenv("QWEN3_MODEL", "qwen/qwen3-8b"),
+        base_url=os.getenv(
+            "QWEN3_BASE_URL", "https://openrouter.ai/api/v1"),
+        key_env="OPENROUTER_API_KEY",
+        family="multilingual",
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+    ),
+    "llama-3.3-70b": dict(
+        model_id=os.getenv(
+            "LLAMA33_MODEL", "meta-llama/llama-3.3-70b-instruct"),
+        base_url=os.getenv(
+            "LLAMA33_BASE_URL", "https://openrouter.ai/api/v1"),
+        key_env="OPENROUTER_API_KEY",
+        family="multilingual",
+    ),
+    "gemma-2-9b": dict(
+        model_id=os.getenv("GEMMA2_MODEL", "google/gemma-2-9b-it"),
+        base_url=os.getenv(
+            "GEMMA2_BASE_URL", "https://openrouter.ai/api/v1"),
+        key_env="OPENROUTER_API_KEY",
+        family="multilingual",
+    ),
 }
 
 VARIETIES = ["msa", "gulf", "egyptian", "levantine", "sudanese"]
@@ -174,9 +197,12 @@ def _chat(name, messages, temperature, max_tokens=512, retries=4):
                     raise RuntimeError(
                         f"empty response: status={status}, reason={reason}")
             else:
-                r = client.chat.completions.create(
+                kwargs = dict(
                     model=spec["model_id"], messages=messages,
                     temperature=temperature, max_tokens=max_tokens)
+                if spec.get("extra_body"):
+                    kwargs["extra_body"] = spec["extra_body"]
+                r = client.chat.completions.create(**kwargs)
                 answer = r.choices[0].message.content
             return ((answer or "").strip(), "",
                     getattr(r, "model", spec["model_id"]))
