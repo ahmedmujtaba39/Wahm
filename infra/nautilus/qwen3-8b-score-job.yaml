@@ -50,6 +50,8 @@ spec:
 
               run_dir = (Path('/results/results/wahm-generations') /
                          os.environ['WAHM_RUN_ID'] / 'qwen3-8b')
+              input_manifest = json.loads(
+                  (run_dir / 'input_manifest.json').read_text(encoding='utf-8'))
               rows = list(csv.DictReader(
                   (run_dir / 'scores_combined.csv').open(encoding='utf-8')))
               counts = Counter(r['variety'] for r in rows)
@@ -69,7 +71,8 @@ spec:
                       f'Layer 2 coverage mismatch: {deferred=} {layer2_scored=}')
               summary = {
                   'run_id': os.environ['WAHM_RUN_ID'],
-                  'input_commit': os.environ['WAHM_GIT_COMMIT'],
+                  'input_commit': input_manifest['input_commit'],
+                  'score_commit': os.environ['WAHM_GIT_COMMIT'],
                   'rows': len(rows),
                   'rows_by_variety': dict(sorted(counts.items())),
                   'layer1': dict(Counter(r['layer1_decision'] for r in rows)),
