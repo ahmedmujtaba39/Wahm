@@ -91,6 +91,28 @@ MODELS = {
         key_env="OPENROUTER_API_KEY",
         family="multilingual",
     ),
+    "qwen3-8b": dict(
+        model_id=os.getenv("QWEN3_MODEL", "qwen/qwen3-8b"),
+        base_url=os.getenv(
+            "QWEN3_BASE_URL", "https://openrouter.ai/api/v1"),
+        key_env="OPENROUTER_API_KEY",
+        family="multilingual",
+    ),
+    "llama-3.3-70b": dict(
+        model_id=os.getenv(
+            "LLAMA33_MODEL", "meta-llama/llama-3.3-70b-instruct"),
+        base_url=os.getenv(
+            "LLAMA33_BASE_URL", "https://openrouter.ai/api/v1"),
+        key_env="OPENROUTER_API_KEY",
+        family="multilingual",
+    ),
+    "gemma-2-9b": dict(
+        model_id=os.getenv("GEMMA2_MODEL", "google/gemma-2-9b-it"),
+        base_url=os.getenv(
+            "GEMMA2_BASE_URL", "https://openrouter.ai/api/v1"),
+        key_env="OPENROUTER_API_KEY",
+        family="multilingual",
+    ),
 }
 
 VARIETIES = ["msa", "gulf", "egyptian", "levantine", "sudanese"]

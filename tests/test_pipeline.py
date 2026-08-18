@@ -135,6 +135,14 @@ class TranslationTests(unittest.TestCase):
 
 
 class GenerationTests(unittest.TestCase):
+    def test_requested_multilingual_model_ids_are_registered(self):
+        self.assertEqual(generate.MODELS["qwen3-8b"]["model_id"],
+                         "qwen/qwen3-8b")
+        self.assertEqual(generate.MODELS["llama-3.3-70b"]["model_id"],
+                         "meta-llama/llama-3.3-70b-instruct")
+        self.assertEqual(generate.MODELS["gemma-2-9b"]["model_id"],
+                         "google/gemma-2-9b-it")
+
     def test_responses_model_omits_unsupported_temperature(self):
         class Responses:
             def create(self, **kwargs):
