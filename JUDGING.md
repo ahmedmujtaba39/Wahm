@@ -89,15 +89,22 @@ Run any prespecified input variant separately:
 python train_judge.py --input-variant question_gold_answer --output arabert_judge_question_gold_answer
 ```
 
-The accepted gold-answer checkpoint was trained on NRP Nautilus from commit
-`e9c5abbf2048c7e2d5762036b722aebc154e7295` using `judge_train.csv`. It selected
-a threshold of 0.235 on the validation partition. Validation F1/ROC-AUC are
-0.8428/0.8856; held-out test F1/ROC-AUC are 0.8557/0.9122. The checkpoint and
-its predictions are packaged in `results/judge_v2_e9c5abb/`; the weight hash is
-`04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895`. The
-541 MB checkpoint is the `model.safetensors` asset on the
-`judge-v2-e9c5abb` GitHub release; public forks cannot add objects to the
-upstream repository's Git LFS store.
+The accepted question-aware checkpoint was trained on NRP Nautilus from
+commit `3411cf028f7148a49b6b5ddaa73c7d829663701a` using `judge_train.csv`.
+Validation selected `question_gold_answer` over `gold_answer` and
+`answer_only`, with ROC-AUC 0.8995 and PR-AUC 0.9252. Its validation-selected
+threshold is 0.135. The single held-out test evaluation obtained F1 0.8617,
+ROC-AUC 0.9180, and PR-AUC 0.9331. The checkpoint, predictions, training
+history, and ablation metadata are packaged in `results/judge_v2_3411cf0/`;
+the weight hash is
+`ed0bb0387eed6a94519aea596795e2f5520f552b9c55f35343cd6e343f01c751`.
+The 541 MB checkpoint is distributed as a GitHub release asset because public
+forks cannot add objects to the upstream repository's Git LFS store.
+
+Training loss decreased across all three epochs. Validation loss was lowest
+at epoch 2 and increased at epoch 3, while validation ROC-AUC increased from
+0.8977 to 0.8995. This is recorded as mild loss-level overfitting; the final
+checkpoint follows the prespecified validation ROC-AUC selection rule.
 
 The local environment passed an end-to-end tiny-model smoke test, whose metrics
 are not research results. An earlier full run used the raw-source filename and

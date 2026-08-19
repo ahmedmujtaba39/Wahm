@@ -33,7 +33,7 @@ spec:
               git -C /tmp/wahm checkout --detach "${WAHM_GIT_COMMIT}"
               python -m pip install --no-cache-dir -r /tmp/wahm/requirements-judge.txt
 
-              model_dir="/judge/results/wahm-judge/${WAHM_JUDGE_RUN}/arabert-gold-answer"
+              model_dir="/judge/${WAHM_JUDGE_MODEL_PATH}"
               test -s "${model_dir}/model.safetensors"
               test -s "${model_dir}/judge_metadata.json"
               cd /tmp/wahm
@@ -146,6 +146,8 @@ spec:
               value: __WAHM_GIT_COMMIT__
             - name: WAHM_JUDGE_RUN
               value: __WAHM_JUDGE_RUN__
+            - name: WAHM_JUDGE_MODEL_PATH
+              value: __WAHM_JUDGE_MODEL_PATH__
             - name: TOKENIZERS_PARALLELISM
               value: "false"
             - name: WANDB_DISABLED

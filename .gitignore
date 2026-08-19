@@ -13,5 +13,6 @@ arabert_judge_*/
 layer3/
 _smoke_judge/
 artifacts/
+outputs/
 results/judge_v2_*/model.safetensors
 *.xlsx.inspect.ndjson

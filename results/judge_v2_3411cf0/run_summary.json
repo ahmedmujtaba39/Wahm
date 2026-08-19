@@ -1,0 +1,32 @@
+{
+  "decision_threshold": 0.135,
+  "epochs_logged": 3,
+  "judge_metadata_sha256": "e8970d56aa18f9215b9c74273f910d3a76e4e803440f617de6e6b0ebbc903343",
+  "model_weights_bytes": 540803072,
+  "model_weights_sha256": "ed0bb0387eed6a94519aea596795e2f5520f552b9c55f35343cd6e343f01c751",
+  "test_metrics": {
+    "accuracy": 0.832936,
+    "f1": 0.86166,
+    "false_negative": 33,
+    "false_positive": 107,
+    "pr_auc": 0.933122,
+    "precision": 0.802947,
+    "recall": 0.929638,
+    "roc_auc": 0.917977,
+    "true_negative": 262,
+    "true_positive": 436
+  },
+  "trainer_state_sha256": "b1585a0d2e2f54f27f9aeccb08a19bf0b1bf17b72cd9bda5e376e3df0445c7eb",
+  "validation_metrics": {
+    "accuracy": 0.821216,
+    "f1": 0.847251,
+    "false_negative": 59,
+    "false_positive": 91,
+    "pr_auc": 0.925171,
+    "precision": 0.820513,
+    "recall": 0.875789,
+    "roc_auc": 0.899523,
+    "true_negative": 273,
+    "true_positive": 416
+  }
+}

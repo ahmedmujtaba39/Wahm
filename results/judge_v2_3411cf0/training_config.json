@@ -1,0 +1,51 @@
+{
+  "base_model": "aubmindlab/bert-base-arabertv2",
+  "base_model_revision": "97522efce17efa33036ac619802d5cec238dcad9",
+  "data": "judge_train.csv",
+  "data_sha256": "0f5c48d9658acc454c4a1cb948d4b59d9e997c9de910627189d48678db2b8243",
+  "decision_threshold": 0.135,
+  "input": "question + gold_answer + answer",
+  "max_steps": 471,
+  "n_test": 838,
+  "n_train": 2518,
+  "n_validation": 839,
+  "num_train_epochs": 3,
+  "seed": 42,
+  "split_method": "nested_stratified_group_k_fold_by_question",
+  "test_fold": 0,
+  "threshold_selection": {
+    "candidate_max": 0.95,
+    "candidate_min": 0.05,
+    "candidate_step": 0.005,
+    "checkpoint_metric": "validation_roc_auc",
+    "objective": "maximum_f1",
+    "partition": "validation",
+    "tie_break": "closest_to_0.5"
+  },
+  "training_arguments": {
+    "data_seed": 42,
+    "effective_train_batch_size_single_gpu": 16,
+    "eval_strategy": "epoch",
+    "fp16": true,
+    "full_determinism": true,
+    "gradient_accumulation_steps": 2,
+    "greater_is_better": true,
+    "learning_rate": 2e-05,
+    "load_best_model_at_end": true,
+    "logging_strategy": "epoch",
+    "metric_for_best_model": "roc_auc",
+    "num_train_epochs": 3,
+    "per_device_eval_batch_size": 8,
+    "per_device_train_batch_size": 8,
+    "save_strategy": "epoch",
+    "save_total_limit": 1,
+    "seed": 42,
+    "weight_decay": 0.01
+  },
+  "validation_fold": 0,
+  "versions": {
+    "datasets": "3.6.0",
+    "torch": "2.7.1+cu118",
+    "transformers": "4.46.3"
+  }
+}
