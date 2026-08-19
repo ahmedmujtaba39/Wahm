@@ -23,7 +23,9 @@ that label.
 `score_layer1.py` is a mechanical router, not a factual judge. It sends an
 answer to the separate `degeneration` outcome only for observable generation
 failures: an explicit generation error, an empty answer, foreign CJK/Hangul
-script, role markers, code fences, or heavy repeated token sequences. Every
+script above the conservative density threshold, role markers, code fences,
+or heavy repeated token sequences. A stray foreign token remains an audit
+signal rather than automatically invalidating the response. Every
 other answer is deferred to Layer 2.
 
 Normalized gold-token coverage is retained as a diagnostic feature only. It
@@ -55,6 +57,21 @@ The old notebook's row-random split leaked questions across partitions and
 must not be cited. Its TF-IDF AUC of 0.82 does not survive question-disjoint
 evaluation; five-fold grouped TF-IDF yields mean AUC 0.578.
 
+### Layer 2 input ablation
+
+The final input representation is selected from three prespecified variants:
+answer only, reference answer plus candidate answer, and question plus
+reference answer plus candidate answer. All variants use the identical frozen
+question-grouped split and training configuration. Each variant selects its
+checkpoint by validation ROC-AUC and calibrates its threshold by validation
+F1. The variants are then ranked by validation ROC-AUC, with validation F1 as
+the tie-break. Test metrics are unavailable during this selection step; the
+held-out test partition is evaluated exactly once for the frozen winner.
+
+Metadata additionally records PR-AUC, the confusion matrix components, and
+recall for each of the nine overlapping AraHalluEval source tags. Per-tag
+figures are recalls for a binary classifier, not nine-class accuracy.
+
 ## Training
 
 On a CUDA training machine:
@@ -66,10 +83,10 @@ pip install -r requirements-judge.txt
 python train_judge.py --output arabert_judge_gold_answer
 ```
 
-Run the answer-only ablation separately:
+Run any prespecified input variant separately:
 
 ```powershell
-python train_judge.py --answer-only --output arabert_judge_answer_only
+python train_judge.py --input-variant question_gold_answer --output arabert_judge_question_gold_answer
 ```
 
 The accepted gold-answer checkpoint was trained on NRP Nautilus from commit
