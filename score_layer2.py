@@ -1,9 +1,20 @@
-"""Apply a trained AraBERT judge to rows deferred by WAHM Layer 1."""
+"""Apply the factual judge to valid rows routed by WAHM Judge v2 Layer 1."""
 
 import argparse
 import csv
 import json
 from pathlib import Path
+
+
+def final_decision(layer1_decision, probability, threshold):
+    """Return three-class decision, factual label, and headline failure label."""
+    if layer1_decision == "degeneration":
+        return "degeneration", "", 1
+    if layer1_decision != "defer" or probability is None:
+        raise ValueError(f"unexpected Layer 1 route: {layer1_decision!r}")
+    hallucinated = probability >= threshold
+    return ("factual_hallucination" if hallucinated else "clean",
+            int(hallucinated), int(hallucinated))
 
 
 def run(input_path="scores_layer1.csv", model_path="arabert_judge_gold_answer",
@@ -45,21 +56,23 @@ def run(input_path="scores_layer1.csv", model_path="arabert_judge_gold_answer",
             probabilities.update(zip(indices, probs))
 
     fields = list(rows[0]) + ["layer2_hallucination_probability",
-                              "combined_decision", "combined_label"]
+                              "layer2_decision_threshold",
+                              "combined_decision", "combined_label",
+                              "headline_failure_label"]
     with open(output_path, "w", encoding="utf-8", newline="") as target:
         writer = csv.DictWriter(target, fieldnames=fields)
         writer.writeheader()
         for index, row in enumerate(rows):
             probability = probabilities.get(index)
-            if probability is None:
-                decision = row["layer1_decision"]
-                probability_text = ""
-            else:
-                decision = "hallucinated" if probability >= threshold else "clean"
-                probability_text = f"{probability:.6f}"
+            decision, label, headline_label = final_decision(
+                row["layer1_decision"], probability, threshold)
+            probability_text = "" if probability is None else f"{probability:.6f}"
             row.update(layer2_hallucination_probability=probability_text,
+                       layer2_decision_threshold=(
+                           "" if probability is None else f"{threshold:.6f}"),
                        combined_decision=decision,
-                       combined_label=int(decision == "hallucinated"))
+                       combined_label=label,
+                       headline_failure_label=headline_label)
             writer.writerow(row)
     print(f"wrote {output_path}: Layer 2 scored {len(deferred)}/{len(rows)} rows")
 

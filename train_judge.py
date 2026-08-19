@@ -1,6 +1,8 @@
 """Fine-tune and evaluate AraBERT with question-disjoint data partitions."""
 
 import argparse
+import csv
+import hashlib
 import json
 from pathlib import Path
 
@@ -19,10 +21,20 @@ def _probabilities(logits, np):
 
 def _metrics_at_threshold(labels, probabilities, threshold, metrics):
     predictions = (probabilities >= threshold).astype(int)
+    true_negative, false_positive, false_negative, true_positive = \
+        metrics["confusion"](labels, predictions, labels=[0, 1]).ravel()
     return {
         "accuracy": round(float(metrics["accuracy"](labels, predictions)), 6),
+        "precision": round(float(metrics["precision"](
+            labels, predictions, zero_division=0)), 6),
+        "recall": round(float(metrics["recall"](
+            labels, predictions, zero_division=0)), 6),
         "f1": round(float(metrics["f1"](labels, predictions)), 6),
         "roc_auc": round(float(metrics["roc_auc"](labels, probabilities)), 6),
+        "true_negative": int(true_negative),
+        "false_positive": int(false_positive),
+        "false_negative": int(false_negative),
+        "true_positive": int(true_positive),
     }
 
 
@@ -44,7 +56,8 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
     import torch
     import transformers
     from datasets import Dataset
-    from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+    from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
+                                 precision_score, recall_score, roc_auc_score)
     from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                               DataCollatorWithPadding, Trainer, TrainingArguments)
 
@@ -95,7 +108,8 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         return _metrics_at_threshold(
             output.label_ids, probabilities, 0.5,
             {"accuracy": accuracy_score, "f1": f1_score,
-             "roc_auc": roc_auc_score})
+             "precision": precision_score, "recall": recall_score,
+             "roc_auc": roc_auc_score, "confusion": confusion_matrix})
 
     output_path = Path(output_dir)
     arguments = TrainingArguments(
@@ -110,7 +124,8 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         learning_rate=2e-5,
         weight_decay=0.01,
         load_best_model_at_end=True,
-        metric_for_best_model="f1",
+        metric_for_best_model="roc_auc",
+        greater_is_better=True,
         report_to="none",
         seed=42,
         fp16=torch.cuda.is_available(),
@@ -130,12 +145,15 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
     test_output = trainer.predict(test_dataset)
     test_probabilities = _probabilities(test_output.predictions, np)
     metric_functions = {"accuracy": accuracy_score, "f1": f1_score,
-                        "roc_auc": roc_auc_score}
+                        "precision": precision_score, "recall": recall_score,
+                        "roc_auc": roc_auc_score,
+                        "confusion": confusion_matrix}
 
     def group_ids(indices):
         return sorted({rows[index]["sample_index"] for index in indices},
                       key=lambda value: int(value))
 
+    data_bytes = Path(data_path).read_bytes()
     metadata = {
         "base_model": model_source_id or model_name,
         "base_model_load_path": model_name,
@@ -143,10 +161,21 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         "smoke_test": smoke_groups is not None,
         "input": "gold_answer + answer" if use_gold else "answer only",
         "data": data_path,
+        "data_sha256": hashlib.sha256(data_bytes).hexdigest(),
         "seed": 42,
+        "split_method": "nested_stratified_group_k_fold_by_question",
         "test_fold": test_fold,
         "validation_fold": validation_fold,
         "decision_threshold": round(threshold, 6),
+        "threshold_selection": {
+            "checkpoint_metric": "validation_roc_auc",
+            "partition": "validation",
+            "objective": "maximum_f1",
+            "candidate_min": 0.05,
+            "candidate_max": 0.95,
+            "candidate_step": 0.005,
+            "tie_break": "closest_to_0.5",
+        },
         "validation_metrics": _metrics_at_threshold(
             validation_output.label_ids, validation_probabilities, threshold,
             metric_functions),
@@ -168,6 +197,32 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
     output_path.mkdir(parents=True, exist_ok=True)
     trainer.save_model(str(output_path))
     tokenizer.save_pretrained(str(output_path))
+    trainer.state.save_to_json(str(output_path / "trainer_state.json"))
+
+    def write_predictions(filename, indices, labels, probabilities):
+        fields = ["row_index", "sample_index", "question", "gold_answer",
+                  "answer", "gold_label", "hallucination_probability",
+                  "predicted_label"]
+        with (output_path / filename).open(
+                "w", encoding="utf-8", newline="") as target:
+            writer = csv.DictWriter(target, fieldnames=fields)
+            writer.writeheader()
+            for index, label, probability in zip(indices, labels, probabilities):
+                writer.writerow({
+                    "row_index": index,
+                    "sample_index": rows[index]["sample_index"],
+                    "question": rows[index].get("question", ""),
+                    "gold_answer": rows[index]["gold_answer"],
+                    "answer": rows[index]["answer"],
+                    "gold_label": int(label),
+                    "hallucination_probability": f"{probability:.8f}",
+                    "predicted_label": int(probability >= threshold),
+                })
+
+    write_predictions("validation_predictions.csv", validation_indices,
+                      validation_output.label_ids, validation_probabilities)
+    write_predictions("test_predictions.csv", test_indices,
+                      test_output.label_ids, test_probabilities)
     (output_path / "judge_metadata.json").write_text(
         json.dumps(metadata, indent=2), encoding="utf-8")
     print(json.dumps({"decision_threshold": metadata["decision_threshold"],

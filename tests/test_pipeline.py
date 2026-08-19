@@ -12,7 +12,9 @@ import analyze_results
 import evaluate_layer3
 import judge_data
 import prepare_layer3
+import prepare_judge_audit
 import score_layer1
+import score_layer2
 import translate
 from train_judge import _model_load_kwargs
 from train_layer2_variants import stratified_row_split
@@ -36,24 +38,37 @@ class ArabicTextTests(unittest.TestCase):
 
 
 class LayerOneTests(unittest.TestCase):
-    def test_clean_exact_reference(self):
+    def test_exact_reference_still_defers_to_factual_judge(self):
         coverage, decision, reasons = score_layer1.score_answer(
             "فازت الأوروغواي ببطولتين.", "بطولتين")
-        self.assertEqual((coverage, decision, reasons), (1.0, "clean", []))
+        self.assertEqual((coverage, decision, reasons), (1.0, "defer", []))
 
     def test_partial_reference_defers(self):
         _, decision, _ = score_layer1.score_answer("بيير كوري", "بيير كوري وأخوه جاك")
         self.assertEqual(decision, "defer")
 
-    def test_no_reference_overlap_is_hallucinated(self):
+    def test_no_reference_overlap_still_defers_to_factual_judge(self):
         _, decision, _ = score_layer1.score_answer("لا أعرف", "بطولتين")
-        self.assertEqual(decision, "hallucinated")
+        self.assertEqual(decision, "defer")
 
     def test_degeneration_overrides_clean_coverage(self):
         _, decision, reasons = score_layer1.score_answer(
             "بطولتين 中文", "بطولتين")
-        self.assertEqual(decision, "hallucinated")
+        self.assertEqual(decision, "degeneration")
         self.assertIn("foreign_script", reasons)
+
+    def test_known_normalization_edge_cases_never_receive_factual_labels(self):
+        for answer, gold in (("تفليس", "تبليسي"),
+                             ("فرنسية", "فرنسي"),
+                             ("7", "سبع")):
+            with self.subTest(answer=answer, gold=gold):
+                _, decision, reasons = score_layer1.score_answer(answer, gold)
+                self.assertEqual((decision, reasons), ("defer", []))
+
+    def test_empty_or_failed_generation_is_invalid(self):
+        _, decision, reasons = score_layer1.score_answer("", "إجابة", "timeout")
+        self.assertEqual(decision, "degeneration")
+        self.assertEqual(reasons, ["generation_error", "empty_answer"])
 
     def test_decimal_comma_is_not_treated_as_variant_separator(self):
         variants = score_layer1.gold_variants(
@@ -69,6 +84,25 @@ class LayerOneTests(unittest.TestCase):
         canonical = score_layer1.canonical_generations(rows)
         self.assertEqual(len(canonical), 1)
         self.assertEqual(canonical[0]["answer"], "answer")
+
+
+class LayerTwoRoutingTests(unittest.TestCase):
+    def test_factual_rows_use_validation_threshold(self):
+        self.assertEqual(
+            score_layer2.final_decision("defer", 0.7, 0.6),
+            ("factual_hallucination", 1, 1))
+        self.assertEqual(
+            score_layer2.final_decision("defer", 0.5, 0.6),
+            ("clean", 0, 0))
+
+    def test_degeneration_is_preserved_outside_factual_binary_label(self):
+        self.assertEqual(
+            score_layer2.final_decision("degeneration", None, 0.6),
+            ("degeneration", "", 1))
+
+    def test_unexpected_layer1_route_is_rejected(self):
+        with self.assertRaises(ValueError):
+            score_layer2.final_decision("clean", None, 0.6)
 
 
 class TranslationTests(unittest.TestCase):
@@ -378,8 +412,32 @@ class AnalysisTests(unittest.TestCase):
                 row("q1", "gulf", "hallucinated"),
                 row("q3", "gulf", "hallucinated")]
         result = analyze_results.analyze(rows)[0]
-        self.assertEqual(result["n_paired"], 1)
+        self.assertEqual(result["n_paired_factual"], 1)
         self.assertEqual(result["hds"], 1.0)
+
+    def test_transitions_mcnemar_and_degeneration_are_separate(self):
+        def row(qid, variety, decision):
+            return {"qid": qid, "variety": variety, "condition": "direct",
+                    "model": "m", "family": "test",
+                    "combined_decision": decision,
+                    "degeneration_reasons": (
+                        "heavy_repetition" if decision == "degeneration" else "")}
+
+        rows = [
+            row("q1", "msa", "clean"),
+            row("q2", "msa", "factual_hallucination"),
+            row("q3", "msa", "degeneration"),
+            row("q1", "gulf", "factual_hallucination"),
+            row("q2", "gulf", "clean"),
+            row("q3", "gulf", "clean"),
+        ]
+        result = analyze_results.analyze(rows, bootstrap_iterations=100)[0]
+        self.assertEqual(result["n_paired_total"], 3)
+        self.assertEqual(result["n_paired_factual"], 2)
+        self.assertEqual(result["clean_to_hallucination"], 1)
+        self.assertEqual(result["hallucination_to_clean"], 1)
+        self.assertEqual(result["n_degenerated_msa"], 1)
+        self.assertEqual(result["mcnemar_exact_p"], 1.0)
 
 
 class LayerThreeTests(unittest.TestCase):
@@ -398,6 +456,27 @@ class LayerThreeTests(unittest.TestCase):
         self.assertEqual([row["qid"] for row in first],
                          [row["qid"] for row in second])
         self.assertEqual(len(first), 4)
+
+    def test_judge_v2_audit_sampling_covers_routes_and_varieties(self):
+        rows = []
+        for variety in ("msa", "gulf", "egyptian", "levantine", "sudanese"):
+            for decision, probability in (
+                    ("degeneration", ""), ("clean", "0.49"),
+                    ("factual_hallucination", "0.51")):
+                rows.append({
+                    "variety": variety,
+                    "combined_decision": decision,
+                    "layer2_hallucination_probability": probability,
+                    "layer2_decision_threshold": "0.5" if probability else "",
+                    "qid": f"{variety}-{decision}",
+                })
+        selected = prepare_judge_audit.stratified_sample(rows, 15, seed=42)
+        self.assertEqual(len(selected), 15)
+        self.assertEqual({row["variety"] for row in selected},
+                         {"msa", "gulf", "egyptian", "levantine", "sudanese"})
+        self.assertEqual({prepare_judge_audit.audit_route(row) for row in selected},
+                         {"layer1_degeneration", "layer2_clean",
+                          "layer2_hallucination"})
 
 
 if __name__ == "__main__":
