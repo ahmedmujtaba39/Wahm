@@ -171,11 +171,15 @@ def analyze(rows, bootstrap_iterations=2000, seed=42):
     return results
 
 
-def run(input_path="scores_combined.csv",
+def run(input_paths="scores_combined.csv",
         json_path="results/analysis.json", csv_path="results/analysis.csv",
         bootstrap_iterations=2000, seed=42):
-    with open(input_path, encoding="utf-8", newline="") as source:
-        rows = list(csv.DictReader(source))
+    if isinstance(input_paths, (str, Path)):
+        input_paths = [input_paths]
+    rows = []
+    for input_path in input_paths:
+        with open(input_path, encoding="utf-8-sig", newline="") as source:
+            rows.extend(csv.DictReader(source))
     results = analyze(rows, bootstrap_iterations, seed)
     if not results:
         raise SystemExit("ERROR: no paired dialect/MSA results were available")
@@ -195,10 +199,13 @@ def run(input_path="scores_combined.csv",
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default="scores_combined.csv")
+    inputs = parser.add_mutually_exclusive_group()
+    inputs.add_argument("--input", dest="input_paths", action="append")
+    inputs.add_argument("--inputs", dest="input_paths", nargs="+")
     parser.add_argument("--json", default="results/analysis.json")
     parser.add_argument("--csv", default="results/analysis.csv")
     parser.add_argument("--bootstrap-iterations", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    run(args.input, args.json, args.csv, args.bootstrap_iterations, args.seed)
+    run(args.input_paths or ["scores_combined.csv"], args.json, args.csv,
+        args.bootstrap_iterations, args.seed)
