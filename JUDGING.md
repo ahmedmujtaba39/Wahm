@@ -72,11 +72,19 @@ Run the answer-only ablation separately:
 python train_judge.py --answer-only --output arabert_judge_answer_only
 ```
 
-The local environment passed an end-to-end tiny-model smoke test. Its metrics
+The accepted gold-answer checkpoint was trained on NRP Nautilus from commit
+`e9c5abbf2048c7e2d5762036b722aebc154e7295` using `judge_train.csv`. It selected
+a threshold of 0.235 on the validation partition. Validation F1/ROC-AUC are
+0.8428/0.8856; held-out test F1/ROC-AUC are 0.8557/0.9122. The checkpoint and
+its predictions are packaged in `results/judge_v2_e9c5abb/`; the weight hash is
+`04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895`. The
+541 MB checkpoint is the `model.safetensors` asset on the
+`judge-v2-e9c5abb` GitHub release; public forks cannot add objects to the
+upstream repository's Git LFS store.
+
+The local environment passed an end-to-end tiny-model smoke test, whose metrics
 are not research results. An earlier full run used the raw-source filename and
-is not accepted as the final Layer 2 artifact after the binary training schema
-was formalized. The next NRP Nautilus run must use `judge_train.csv`; only its
-saved `judge_metadata.json` may be cited.
+is not accepted after the binary training schema was formalized.
 
 ## Combined scoring
 

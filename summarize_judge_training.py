@@ -30,7 +30,10 @@ def summarize(model_dir, output_dir):
     for event in state.get("log_history", []):
         if "epoch" not in event:
             continue
-        epoch = round(float(event["epoch"]), 6)
+        raw_epoch = float(event["epoch"])
+        nearest_epoch = round(raw_epoch)
+        epoch = (nearest_epoch if abs(raw_epoch - nearest_epoch) < 0.02
+                 else round(raw_epoch, 6))
         row = by_epoch.setdefault(epoch, {field: "" for field in FIELDS})
         row["epoch"] = epoch
         mappings = {

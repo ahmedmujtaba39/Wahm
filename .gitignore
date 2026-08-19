@@ -13,3 +13,4 @@ arabert_judge_*/
 layer3/
 _smoke_judge/
 artifacts/
+results/judge_v2_*/model.safetensors

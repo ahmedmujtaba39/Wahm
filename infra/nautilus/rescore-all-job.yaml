@@ -23,6 +23,9 @@ spec:
           args:
             - |
               set -euo pipefail
+              log="/results/results/wahm-generations/judge-v2-${WAHM_JUDGE_RUN}.log"
+              mkdir -p "$(dirname "${log}")"
+              exec > >(tee -a "${log}") 2>&1
               apt-get update
               apt-get install -y --no-install-recommends git ca-certificates
               rm -rf /var/lib/apt/lists/*

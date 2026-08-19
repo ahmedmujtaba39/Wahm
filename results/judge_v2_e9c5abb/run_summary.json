@@ -1,0 +1,30 @@
+{
+  "decision_threshold": 0.235,
+  "epochs_logged": 3,
+  "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305",
+  "model_weights_bytes": 540803072,
+  "model_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895",
+  "test_metrics": {
+    "accuracy": 0.832936,
+    "f1": 0.85567,
+    "false_negative": 54,
+    "false_positive": 86,
+    "precision": 0.828343,
+    "recall": 0.884861,
+    "roc_auc": 0.912242,
+    "true_negative": 283,
+    "true_positive": 415
+  },
+  "trainer_state_sha256": "422d9eecd1446a624906afcf9bd9ba02e7352aedc64347d177b50454d258caf7",
+  "validation_metrics": {
+    "accuracy": 0.821216,
+    "f1": 0.842767,
+    "false_negative": 73,
+    "false_positive": 77,
+    "precision": 0.839248,
+    "recall": 0.846316,
+    "roc_auc": 0.88561,
+    "true_negative": 287,
+    "true_positive": 402
+  }
+}
