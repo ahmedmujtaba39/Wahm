@@ -1,0 +1,17 @@
+{
+  "decisions": {
+    "clean": 194,
+    "degeneration": 4,
+    "factual_hallucination": 102
+  },
+  "generations": "/results/results/wahm-generations/a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e/allam/generations.csv",
+  "judge_metadata_sha256": "e8970d56aa18f9215b9c74273f910d3a76e4e803440f617de6e6b0ebbc903343",
+  "judge_run": "3411cf0-question-gold-answer",
+  "judge_weights_sha256": "ed0bb0387eed6a94519aea596795e2f5520f552b9c55f35343cd6e343f01c751",
+  "rows": 300,
+  "rows_by_variety": {
+    "msa": 300
+  },
+  "score_commit": "5ca2255f1b7a361180c44ce71098a516e42fc475",
+  "scores_sha256": "00663e87954b41042a1c64247230b91847128878c89fb80f4e994d3ed7a56c88"
+}

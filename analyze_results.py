@@ -68,6 +68,23 @@ def _mcnemar_exact_p(clean_to_hallucination, hallucination_to_clean):
     return min(1.0, 2 * tail)
 
 
+def _benjamini_hochberg(p_values):
+    """Return monotone BH false-discovery-rate adjusted p-values."""
+    count = len(p_values)
+    if not count:
+        return []
+    ordered = sorted(range(count), key=lambda index: p_values[index])
+    adjusted = [1.0] * count
+    running_minimum = 1.0
+    for rank_index in range(count - 1, -1, -1):
+        original_index = ordered[rank_index]
+        rank = rank_index + 1
+        candidate = min(1.0, p_values[original_index] * count / rank)
+        running_minimum = min(running_minimum, candidate)
+        adjusted[original_index] = running_minimum
+    return adjusted
+
+
 def analyze(rows, bootstrap_iterations=2000, seed=42):
     indexed = {}
     for row in rows:
@@ -169,6 +186,10 @@ def analyze(rows, bootstrap_iterations=2000, seed=42):
             "bootstrap_iterations": bootstrap_iterations,
             "bootstrap_seed": seed,
         })
+    adjusted = _benjamini_hochberg(
+        [result["mcnemar_exact_p"] for result in results])
+    for result, q_value in zip(results, adjusted):
+        result["mcnemar_bh_q"] = round(q_value, 6)
     return results
 
 

@@ -488,6 +488,11 @@ class ModelLoadingTests(unittest.TestCase):
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_benjamini_hochberg_is_monotone_in_rank(self):
+        adjusted = analyze_results._benjamini_hochberg([0.01, 0.04, 0.03])
+        self.assertEqual([round(value, 6) for value in adjusted],
+                         [0.03, 0.04, 0.04])
+
     def test_hds_uses_only_qids_paired_with_msa(self):
         def row(qid, variety, decision):
             return {"qid": qid, "variety": variety, "condition": "direct",

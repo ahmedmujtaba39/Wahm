@@ -159,7 +159,8 @@ annotating.
 
 `analyze_results.py` calculates paired factual hallucination rates, HDS,
 degeneration rates, paired transitions, deterministic paired-bootstrap 95%
-confidence intervals, and exact two-sided McNemar tests. Every dialect arm is
-compared with MSA on the exact same QIDs. Factual HR and HDS exclude pairs where
-either response is degeneration; headline failure rates retain them. The MSA
-`direct` arm is the baseline for every dialect condition.
+confidence intervals, exact two-sided McNemar tests, and Benjamini-Hochberg
+false-discovery-rate adjusted q-values across all reported arms. Every dialect
+arm is compared with MSA on the exact same QIDs. Factual HR and HDS exclude
+pairs where either response is degeneration; headline failure rates retain
+them. The MSA `direct` arm is the baseline for every dialect condition.
