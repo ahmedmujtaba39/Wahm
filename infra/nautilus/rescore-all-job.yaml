@@ -52,6 +52,11 @@ spec:
                 run_dir=$(dirname "${generations}")
                 output_dir="${run_dir}/judge_v2/${WAHM_JUDGE_RUN}"
                 mkdir -p "${output_dir}"
+                if [[ -s "${output_dir}/run_summary.json" &&
+                      -s "${output_dir}/scores_combined.csv" ]]; then
+                  echo "Already complete; skipping ${generations}"
+                  continue
+                fi
                 echo "Scoring ${generations}"
                 python score_layer1.py \
                   --input "${generations}" \
@@ -77,8 +82,14 @@ spec:
               rows = list(csv.DictReader(score_path.open(encoding="utf-8-sig")))
               if not rows:
                   raise SystemExit(f"No scored rows in {score_path}")
-              if len(rows) != sum(1 for _ in csv.DictReader(
-                      generation_path.open(encoding="utf-8-sig"))):
+              generation_rows = list(csv.DictReader(
+                  generation_path.open(encoding="utf-8-sig")))
+              canonical_keys = {
+                  (row.get("qid"), row.get("variety"), row.get("condition"),
+                   row.get("model"))
+                  for row in generation_rows
+              }
+              if len(rows) != len(canonical_keys):
                   raise SystemExit(f"Row-count mismatch for {generation_path}")
               deferred = sum(r["layer1_decision"] == "defer" for r in rows)
               scored = sum(bool(r["layer2_hallucination_probability"]) for r in rows)
