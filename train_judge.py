@@ -95,8 +95,10 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
                                  confusion_matrix, f1_score, precision_score,
                                  recall_score, roc_auc_score)
     from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
-                              DataCollatorWithPadding, Trainer, TrainingArguments)
+                              DataCollatorWithPadding, Trainer, TrainingArguments,
+                              set_seed)
 
+    set_seed(42)
     rows = load_judge_rows(data_path)
     if input_variant not in INPUT_VARIANTS:
         raise ValueError(f"input_variant must be one of {INPUT_VARIANTS}")
@@ -166,6 +168,8 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         greater_is_better=True,
         report_to="none",
         seed=42,
+        data_seed=42,
+        full_determinism=True,
         fp16=torch.cuda.is_available(),
     )
     trainer = Trainer(
@@ -237,6 +241,9 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
             "load_best_model_at_end": True,
             "metric_for_best_model": "roc_auc",
             "greater_is_better": True,
+            "seed": 42,
+            "data_seed": 42,
+            "full_determinism": True,
             "fp16": bool(torch.cuda.is_available()),
         },
         "validation_metrics": _metrics_at_threshold(

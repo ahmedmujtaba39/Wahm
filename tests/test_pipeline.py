@@ -185,6 +185,12 @@ class JudgeInputAblationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             select_judge_variant.select(variants)
 
+    def test_training_seeds_before_model_construction(self):
+        source = (ROOT / "train_judge.py").read_text(encoding="utf-8")
+        self.assertLess(source.index("set_seed(42)"),
+                        source.index("AutoModelForSequenceClassification.from_pretrained"))
+        self.assertIn("full_determinism=True", source)
+
 
 class TranslationTests(unittest.TestCase):
     def test_existing_confirmed_gulf_file_loads(self):
