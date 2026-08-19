@@ -1,0 +1,20 @@
+{
+  "decisions": {
+    "clean": 682,
+    "factual_hallucination": 818
+  },
+  "generations": "/results/results/wahm-generations/jais2-f7df1cb-bbd2ffe/jais/generations.csv",
+  "judge_metadata_sha256": "e8970d56aa18f9215b9c74273f910d3a76e4e803440f617de6e6b0ebbc903343",
+  "judge_run": "3411cf0-question-gold-answer",
+  "judge_weights_sha256": "ed0bb0387eed6a94519aea596795e2f5520f552b9c55f35343cd6e343f01c751",
+  "rows": 1500,
+  "rows_by_variety": {
+    "egyptian": 300,
+    "gulf": 300,
+    "levantine": 300,
+    "msa": 300,
+    "sudanese": 300
+  },
+  "score_commit": "5ca2255f1b7a361180c44ce71098a516e42fc475",
+  "scores_sha256": "a67799c46a95897499e948fa9d13ce448595b87deedc9aac8c14b0617b378c6d"
+}

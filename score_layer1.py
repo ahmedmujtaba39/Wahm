@@ -1,4 +1,4 @@
-"""WAHM Layer 1: transparent reference coverage and degeneration checks."""
+"""WAHM Judge v2 Layer 1: mechanical routing and diagnostics only."""
 
 import argparse
 import csv
@@ -62,10 +62,22 @@ def heavy_repetition(text, minimum_repeats=4):
     return False
 
 
-def degeneration_reasons(answer):
+def heavy_foreign_script(text, minimum_characters=3, minimum_density=0.1):
+    """Flag substantial CJK/Hangul contamination, not a stray character."""
+    alphabetic = sum(character.isalpha() for character in text)
+    foreign = len(FOREIGN_GARBAGE.findall(text))
+    return bool(alphabetic and foreign >= minimum_characters and
+                foreign / alphabetic >= minimum_density)
+
+
+def degeneration_reasons(answer, generation_error=""):
     reasons = []
-    if FOREIGN_GARBAGE.search(answer):
-        reasons.append("foreign_script")
+    if generation_error.strip():
+        reasons.append("generation_error")
+    if not answer.strip():
+        reasons.append("empty_answer")
+    if heavy_foreign_script(answer):
+        reasons.append("foreign_script_heavy")
     if ROLE_MARKER.search(answer):
         reasons.append("role_marker")
     if CODE_FENCE.search(answer):
@@ -75,18 +87,15 @@ def degeneration_reasons(answer):
     return reasons
 
 
-def score_answer(answer, gold, clean_threshold=0.9):
-    """Return coverage, decision, and reasons. Decision: clean/hallucinated/defer."""
-    reasons = degeneration_reasons(answer)
+def score_answer(answer, gold, generation_error=""):
+    """Return diagnostic coverage and a mechanical route.
+
+    Coverage never assigns a factual label. Mechanical invalidity is preserved
+    as ``degeneration``; every other answer is deferred to the factual judge.
+    """
+    reasons = degeneration_reasons(answer, generation_error)
     coverage = token_coverage(answer, gold)
-    if reasons:
-        decision = "hallucinated"
-    elif coverage >= clean_threshold:
-        decision = "clean"
-    elif coverage == 0:
-        decision = "hallucinated"
-    else:
-        decision = "defer"
+    decision = "degeneration" if reasons else "defer"
     return coverage, decision, reasons
 
 
@@ -106,8 +115,7 @@ def canonical_generations(rows):
     return list(canonical.values())
 
 
-def run(input_path="generations.csv", output_path="scores_layer1.csv",
-        clean_threshold=0.9):
+def run(input_path="generations.csv", output_path="scores_layer1.csv"):
     with open(input_path, encoding="utf-8", newline="") as source:
         raw_rows = list(csv.DictReader(source))
     rows = canonical_generations(raw_rows)
@@ -121,13 +129,14 @@ def run(input_path="generations.csv", output_path="scores_layer1.csv",
         writer.writeheader()
         for row in rows:
             coverage, decision, reasons = score_answer(
-                row.get("answer", ""), row.get("gold_answer", ""), clean_threshold)
+                row.get("answer", ""), row.get("gold_answer", ""),
+                row.get("error", ""))
             row.update(layer1_coverage=f"{coverage:.3f}",
                        layer1_decision=decision,
                        degeneration_reasons="|".join(reasons))
             writer.writerow(row)
 
-    counts = {name: 0 for name in ("clean", "hallucinated", "defer")}
+    counts = {name: 0 for name in ("degeneration", "defer")}
     with open(output_path, encoding="utf-8", newline="") as scored:
         for row in csv.DictReader(scored):
             counts[row["layer1_decision"]] += 1
@@ -140,6 +149,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="generations.csv")
     parser.add_argument("--output", default="scores_layer1.csv")
-    parser.add_argument("--clean-threshold", type=float, default=0.9)
     args = parser.parse_args()
-    run(args.input, args.output, args.clean_threshold)
+    run(args.input, args.output)

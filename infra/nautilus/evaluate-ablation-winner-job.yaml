@@ -1,0 +1,81 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-judge-evaluate-ablation-winner
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: judge-evaluate-ablation-winner
+spec:
+  activeDeadlineSeconds: 7200
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: judge-evaluate-ablation-winner
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: evaluate
+          image: pytorch/pytorch:2.7.1-cuda11.8-cudnn9-runtime
+          command: ["/bin/bash", "-lc"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update
+              apt-get install -y --no-install-recommends git ca-certificates
+              rm -rf /var/lib/apt/lists/*
+              git clone "${WAHM_GIT_REPOSITORY}" /tmp/wahm
+              git -C /tmp/wahm checkout --detach "${WAHM_GIT_COMMIT}"
+              python -m pip install --no-cache-dir -r /tmp/wahm/requirements-judge.txt
+              root="/workspace/results/wahm-judge-ablation/${WAHM_GIT_COMMIT}"
+              python /tmp/wahm/select_judge_variant.py \
+                --root "${root}" \
+                --output "${root}/selection.json"
+              winner=$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["winner"])' \
+                "${root}/selection.json")
+              python /tmp/wahm/evaluate_judge_test.py \
+                --data /tmp/wahm/judge_train.csv \
+                --model "${root}/${winner}" \
+                --batch-size 32
+              python - <<'PY' > /dev/termination-log
+              import json
+              import os
+              from pathlib import Path
+              root = (Path("/workspace/results/wahm-judge-ablation") /
+                      os.environ["WAHM_GIT_COMMIT"])
+              selection = json.loads((root / "selection.json").read_text())
+              winner = selection["winner"]
+              metadata = json.loads(
+                  (root / winner / "judge_metadata.json").read_text())
+              print(json.dumps({
+                  "winner": winner,
+                  "validation_results": selection["validation_results"],
+                  "test_metrics": metadata["test_metrics"],
+                  "test_per_tag_recall": metadata["test_per_tag_recall"],
+              }, sort_keys=True))
+              PY
+          env:
+            - name: WAHM_GIT_COMMIT
+              value: __WAHM_GIT_COMMIT__
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/cyberuniversal/Wahm.git
+            - name: TOKENIZERS_PARALLELISM
+              value: "false"
+            - name: WANDB_DISABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: "4"
+              memory: 8Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: wahm-judge-539948

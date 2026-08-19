@@ -1,0 +1,20 @@
+{
+  "decisions": {
+    "clean": 749,
+    "factual_hallucination": 751
+  },
+  "generations": "/results/results/wahm-generations/jais2-f7df1cb-bbd2ffe/jais/generations.csv",
+  "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305",
+  "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295",
+  "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895",
+  "rows": 1500,
+  "rows_by_variety": {
+    "egyptian": 300,
+    "gulf": 300,
+    "levantine": 300,
+    "msa": 300,
+    "sudanese": 300
+  },
+  "score_commit": "815600abe59a7565e65357b6169b5589e08c532d",
+  "scores_sha256": "85b4692c5ceafc2d2dfb845c9c55e7c1c33f75d62c24cb923cee17cdbfba822e"
+}

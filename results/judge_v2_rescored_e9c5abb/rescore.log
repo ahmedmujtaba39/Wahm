@@ -1,0 +1,922 @@
+Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+Get:3 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [7569 kB]
+Get:4 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+Get:5 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [84.1 kB]
+Get:6 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [4202 kB]
+Get:7 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1314 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Get:9 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+Get:12 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [4563 kB]
+Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [7914 kB]
+Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [92.7 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1617 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.6 kB]
+Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [82.8 kB]
+Fetched 47.8 MB in 3s (16.6 MB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1 libgdbm-compat4
+  libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34 libpsl5 librtmp1 libsasl2-2
+  libsasl2-modules-db libssh-4 perl perl-base perl-modules-5.34
+Suggested packages:
+  gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui
+  gitk gitweb git-cvs git-mediawiki git-svn gdbm-l10n perl-doc
+  libterm-readline-gnu-perl | libterm-readline-perl-perl make
+  libtap-harness-archive-perl
+Recommended packages:
+  patch less ssh-client libldap-common publicsuffix libsasl2-modules netbase
+The following NEW packages will be installed:
+  git git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1
+  libgdbm-compat4 libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34 libpsl5
+  librtmp1 libsasl2-2 libsasl2-modules-db libssh-4 perl perl-modules-5.34
+The following packages will be upgraded:
+  ca-certificates perl-base
+2 upgraded, 18 newly installed, 0 to remove and 45 not upgraded.
+Need to get 15.5 MB of archives.
+After this operation, 72.9 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-base amd64 5.34.0-3ubuntu1.7 [1763 kB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-modules-5.34 all 5.34.0-3ubuntu1.7 [2977 kB]
+Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm6 amd64 1.23-1 [33.9 kB]
+Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm-compat4 amd64 1.23-1 [6606 B]
+Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libperl5.34 amd64 5.34.0-3ubuntu1.7 [4817 kB]
+Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl amd64 5.34.0-3ubuntu1.7 [232 kB]
+Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates all 20260601~22.04.1 [141 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libexpat1 amd64 2.4.7-1ubuntu0.7 [92.1 kB]
+Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnghttp2-14 amd64 1.43.0-1ubuntu0.4 [76.9 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpsl5 amd64 0.21.0-1.2build2 [58.4 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbrotli1 amd64 1.0.9-2build6 [315 kB]
+Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg2-3ubuntu1.2 [20.5 kB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg2-3ubuntu1.2 [53.8 kB]
+Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-2.5-0 amd64 2.5.20+dfsg-0ubuntu0.22.04.1 [184 kB]
+Get:15 http://archive.ubuntu.com/ubuntu jammy/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build4 [58.2 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libssh-4 amd64 0.9.6-2ubuntu0.22.04.7 [187 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl3-gnutls amd64 7.81.0-1ubuntu1.25 [284 kB]
+Get:18 http://archive.ubuntu.com/ubuntu jammy/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+Get:19 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git-man all 1:2.34.1-1ubuntu1.17 [954 kB]
+Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git amd64 1:2.34.1-1ubuntu1.17 [3174 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 15.5 MB in 2s (7869 kB/s)
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6651 files and directories currently installed.)
+Preparing to unpack .../perl-base_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking perl-base (5.34.0-3ubuntu1.7) over (5.34.0-3ubuntu1.4) ...
+Setting up perl-base (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package perl-modules-5.34.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6651 files and directories currently installed.)
+Preparing to unpack .../00-perl-modules-5.34_5.34.0-3ubuntu1.7_all.deb ...
+Unpacking perl-modules-5.34 (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package libgdbm6:amd64.
+Preparing to unpack .../01-libgdbm6_1.23-1_amd64.deb ...
+Unpacking libgdbm6:amd64 (1.23-1) ...
+Selecting previously unselected package libgdbm-compat4:amd64.
+Preparing to unpack .../02-libgdbm-compat4_1.23-1_amd64.deb ...
+Unpacking libgdbm-compat4:amd64 (1.23-1) ...
+Selecting previously unselected package libperl5.34:amd64.
+Preparing to unpack .../03-libperl5.34_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking libperl5.34:amd64 (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package perl.
+Preparing to unpack .../04-perl_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking perl (5.34.0-3ubuntu1.7) ...
+Preparing to unpack .../05-ca-certificates_20260601~22.04.1_all.deb ...
+Unpacking ca-certificates (20260601~22.04.1) over (20240203~22.04.1) ...
+Selecting previously unselected package libexpat1:amd64.
+Preparing to unpack .../06-libexpat1_2.4.7-1ubuntu0.7_amd64.deb ...
+Unpacking libexpat1:amd64 (2.4.7-1ubuntu0.7) ...
+Selecting previously unselected package libnghttp2-14:amd64.
+Preparing to unpack .../07-libnghttp2-14_1.43.0-1ubuntu0.4_amd64.deb ...
+Unpacking libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+Selecting previously unselected package libpsl5:amd64.
+Preparing to unpack .../08-libpsl5_0.21.0-1.2build2_amd64.deb ...
+Unpacking libpsl5:amd64 (0.21.0-1.2build2) ...
+Selecting previously unselected package libbrotli1:amd64.
+Preparing to unpack .../09-libbrotli1_1.0.9-2build6_amd64.deb ...
+Unpacking libbrotli1:amd64 (1.0.9-2build6) ...
+Selecting previously unselected package libsasl2-modules-db:amd64.
+Preparing to unpack .../10-libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Selecting previously unselected package libsasl2-2:amd64.
+Preparing to unpack .../11-libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+Unpacking libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Selecting previously unselected package libldap-2.5-0:amd64.
+Preparing to unpack .../12-libldap-2.5-0_2.5.20+dfsg-0ubuntu0.22.04.1_amd64.deb ...
+Unpacking libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+Selecting previously unselected package librtmp1:amd64.
+Preparing to unpack .../13-librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb ...
+Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+Selecting previously unselected package libssh-4:amd64.
+Preparing to unpack .../14-libssh-4_0.9.6-2ubuntu0.22.04.7_amd64.deb ...
+Unpacking libssh-4:amd64 (0.9.6-2ubuntu0.22.04.7) ...
+Selecting previously unselected package libcurl3-gnutls:amd64.
+Preparing to unpack .../15-libcurl3-gnutls_7.81.0-1ubuntu1.25_amd64.deb ...
+Unpacking libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.25) ...
+Selecting previously unselected package liberror-perl.
+Preparing to unpack .../16-liberror-perl_0.17029-1_all.deb ...
+Unpacking liberror-perl (0.17029-1) ...
+Selecting previously unselected package git-man.
+Preparing to unpack .../17-git-man_1%3a2.34.1-1ubuntu1.17_all.deb ...
+Unpacking git-man (1:2.34.1-1ubuntu1.17) ...
+Selecting previously unselected package git.
+Preparing to unpack .../18-git_1%3a2.34.1-1ubuntu1.17_amd64.deb ...
+Unpacking git (1:2.34.1-1ubuntu1.17) ...
+Setting up libexpat1:amd64 (2.4.7-1ubuntu0.7) ...
+Setting up libpsl5:amd64 (0.21.0-1.2build2) ...
+Setting up libbrotli1:amd64 (1.0.9-2build6) ...
+Setting up libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+Setting up perl-modules-5.34 (5.34.0-3ubuntu1.7) ...
+Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Setting up ca-certificates (20260601~22.04.1) ...
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+Updating certificates in /etc/ssl/certs...
+rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+14 added, 39 removed; done.
+Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+Setting up libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Setting up libssh-4:amd64 (0.9.6-2ubuntu0.22.04.7) ...
+Setting up git-man (1:2.34.1-1ubuntu1.17) ...
+Setting up libgdbm6:amd64 (1.23-1) ...
+Setting up libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+Setting up libgdbm-compat4:amd64 (1.23-1) ...
+Setting up libperl5.34:amd64 (5.34.0-3ubuntu1.7) ...
+Setting up libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.25) ...
+Setting up perl (5.34.0-3ubuntu1.7) ...
+Setting up liberror-perl (0.17029-1) ...
+Setting up git (1:2.34.1-1ubuntu1.17) ...
+Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
+Processing triggers for ca-certificates (20260601~22.04.1) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+Cloning into '/tmp/wahm'...
+HEAD is now at e9c5abb Record complete Judge training configuration
+Collecting openai<2,>=1.0 (from -r /tmp/wahm/requirements.txt (line 1))
+  Downloading openai-1.109.1-py3-none-any.whl.metadata (29 kB)
+Collecting accelerate<2,>=1.1 (from -r /tmp/wahm/requirements-judge.txt (line 2))
+  Downloading accelerate-1.14.0-py3-none-any.whl.metadata (19 kB)
+Collecting datasets<4,>=3 (from -r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading datasets-3.6.0-py3-none-any.whl.metadata (19 kB)
+Collecting scikit-learn<2,>=1.5 (from -r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading scikit_learn-1.9.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (11 kB)
+Requirement already satisfied: torch>=2.2 in /opt/conda/lib/python3.11/site-packages (from -r /tmp/wahm/requirements-judge.txt (line 5)) (2.7.1+cu118)
+Collecting transformers==4.46.3 (from -r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading transformers-4.46.3-py3-none-any.whl.metadata (44 kB)
+Requirement already satisfied: filelock in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (3.18.0)
+Collecting huggingface-hub<1.0,>=0.23.2 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading huggingface_hub-0.36.2-py3-none-any.whl.metadata (15 kB)
+Requirement already satisfied: numpy>=1.17 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.2.6)
+Requirement already satisfied: packaging>=20.0 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (25.0)
+Requirement already satisfied: pyyaml>=5.1 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (6.0.2)
+Collecting regex!=2019.12.17 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading regex-2026.7.19-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Requirement already satisfied: requests in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.32.3)
+Collecting tokenizers<0.21,>=0.20 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading tokenizers-0.20.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+Collecting safetensors>=0.4.1 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+Requirement already satisfied: tqdm>=4.27 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (4.67.1)
+Collecting anyio<5,>=3.5.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading anyio-4.14.2-py3-none-any.whl.metadata (4.6 kB)
+Requirement already satisfied: distro<2,>=1.7.0 in /opt/conda/lib/python3.11/site-packages (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (1.9.0)
+Collecting httpx<1,>=0.23.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting jiter<1,>=0.4.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading jiter-0.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+Collecting pydantic<3,>=1.9.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)
+Collecting sniffio (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Requirement already satisfied: typing-extensions<5,>=4.11 in /opt/conda/lib/python3.11/site-packages (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (4.14.0)
+Requirement already satisfied: psutil in /opt/conda/lib/python3.11/site-packages (from accelerate<2,>=1.1->-r /tmp/wahm/requirements-judge.txt (line 2)) (7.0.0)
+Collecting pyarrow>=15.0.0 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading pyarrow-25.0.1-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting dill<0.3.9,>=0.3.0 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading dill-0.3.8-py3-none-any.whl.metadata (10 kB)
+Collecting pandas (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading pandas-3.0.5-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting xxhash (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading xxhash-4.0.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (17 kB)
+Collecting multiprocess<0.70.17 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading multiprocess-0.70.16-py311-none-any.whl.metadata (7.2 kB)
+Collecting fsspec<=2025.3.0,>=2023.1.0 (from fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading fsspec-2025.3.0-py3-none-any.whl.metadata (11 kB)
+Collecting scipy>=1.10.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading scipy-1.17.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting joblib>=1.4.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading joblib-1.5.3-py3-none-any.whl.metadata (5.5 kB)
+Collecting narwhals>=2.0.1 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading narwhals-2.24.0-py3-none-any.whl.metadata (15 kB)
+Collecting threadpoolctl>=3.5.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+Requirement already satisfied: idna>=2.8 in /opt/conda/lib/python3.11/site-packages (from anyio<5,>=3.5.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (3.10)
+Collecting aiohttp!=4.0.0a0,!=4.0.0a1 (from fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading aiohttp-3.14.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Requirement already satisfied: certifi in /opt/conda/lib/python3.11/site-packages (from httpx<1,>=0.23.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (2025.4.26)
+Collecting httpcore==1.* (from httpx<1,>=0.23.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.23.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting hf-xet<2.0.0,>=1.1.3 (from huggingface-hub<1.0,>=0.23.2->transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.46.4 (from pydantic<3,>=1.9.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading pydantic_core-2.46.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+Collecting typing-extensions<5,>=4.11 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Requirement already satisfied: sympy>=1.13.3 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (1.14.0)
+Requirement already satisfied: networkx in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.5)
+Requirement already satisfied: jinja2 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.1.6)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu11==11.8.89 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.89)
+Requirement already satisfied: nvidia-cuda-runtime-cu11==11.8.89 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.89)
+Requirement already satisfied: nvidia-cuda-cupti-cu11==11.8.87 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.87)
+Requirement already satisfied: nvidia-cudnn-cu11==9.1.0.70 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (9.1.0.70)
+Requirement already satisfied: nvidia-cublas-cu11==11.11.3.6 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.11.3.6)
+Requirement already satisfied: nvidia-cufft-cu11==10.9.0.58 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (10.9.0.58)
+Requirement already satisfied: nvidia-curand-cu11==10.3.0.86 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (10.3.0.86)
+Requirement already satisfied: nvidia-cusolver-cu11==11.4.1.48 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.4.1.48)
+Requirement already satisfied: nvidia-cusparse-cu11==11.7.5.86 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.7.5.86)
+Requirement already satisfied: nvidia-nccl-cu11==2.21.5 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (2.21.5)
+Requirement already satisfied: nvidia-nvtx-cu11==11.8.86 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.86)
+Requirement already satisfied: triton==3.3.1 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.3.1)
+Requirement already satisfied: setuptools>=40.8.0 in /opt/conda/lib/python3.11/site-packages (from triton==3.3.1->torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (75.8.2)
+Collecting aiohappyeyeballs>=2.5.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiosignal>=1.4.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Requirement already satisfied: attrs>=17.3.0 in /opt/conda/lib/python3.11/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3)) (25.3.0)
+Collecting frozenlist>=1.1.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+Collecting propcache>=0.2.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading propcache-0.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (16 kB)
+Collecting yarl<2.0,>=1.17.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading yarl-1.24.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (103 kB)
+Requirement already satisfied: charset_normalizer<4,>=2 in /opt/conda/lib/python3.11/site-packages (from requests->transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (3.4.2)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.11/site-packages (from requests->transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.4.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /opt/conda/lib/python3.11/site-packages (from sympy>=1.13.3->torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /opt/conda/lib/python3.11/site-packages (from jinja2->torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.0.2)
+Collecting python-dateutil>=2.8.2 (from pandas->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.11/site-packages (from python-dateutil>=2.8.2->pandas->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3)) (1.17.0)
+Downloading transformers-4.46.3-py3-none-any.whl (10.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.0/10.0 MB 556.2 MB/s eta 0:00:00
+Downloading openai-1.109.1-py3-none-any.whl (948 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 948.6/948.6 kB 886.6 MB/s eta 0:00:00
+Downloading accelerate-1.14.0-py3-none-any.whl (389 kB)
+Downloading datasets-3.6.0-py3-none-any.whl (491 kB)
+Downloading scikit_learn-1.9.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.3/9.3 MB 434.6 MB/s eta 0:00:00
+Downloading anyio-4.14.2-py3-none-any.whl (125 kB)
+Downloading dill-0.3.8-py3-none-any.whl (116 kB)
+Downloading fsspec-2025.3.0-py3-none-any.whl (193 kB)
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+Downloading huggingface_hub-0.36.2-py3-none-any.whl (566 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.4/566.4 kB 712.2 MB/s eta 0:00:00
+Downloading hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 460.5 MB/s eta 0:00:00
+Downloading jiter-0.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (347 kB)
+Downloading multiprocess-0.70.16-py311-none-any.whl (143 kB)
+Downloading pydantic-2.13.4-py3-none-any.whl (472 kB)
+Downloading pydantic_core-2.46.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 60.0 MB/s eta 0:00:00
+Downloading tokenizers-0.20.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 40.7 MB/s eta 0:00:00
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Downloading aiohttp-3.14.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 39.9 MB/s eta 0:00:00
+Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (246 kB)
+Downloading yarl-1.24.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (111 kB)
+Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (231 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading joblib-1.5.3-py3-none-any.whl (309 kB)
+Downloading narwhals-2.24.0-py3-none-any.whl (461 kB)
+Downloading propcache-0.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (58 kB)
+Downloading pyarrow-25.0.1-cp311-cp311-manylinux_2_28_x86_64.whl (50.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.1/50.1 MB 450.3 MB/s eta 0:00:00
+Downloading regex-2026.7.19-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (801 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 801.4/801.4 kB 850.3 MB/s eta 0:00:00
+Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (516 kB)
+Downloading scipy-1.17.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.3/35.3 MB 518.9 MB/s eta 0:00:00
+Downloading threadpoolctl-3.6.0-py3-none-any.whl (18 kB)
+Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Downloading pandas-3.0.5-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (11.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.3/11.3 MB 399.1 MB/s eta 0:00:00
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+Downloading xxhash-4.0.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (261 kB)
+Installing collected packages: xxhash, typing-extensions, threadpoolctl, sniffio, scipy, safetensors, regex, python-dateutil, pyarrow, propcache, narwhals, multidict, joblib, jiter, hf-xet, h11, fsspec, frozenlist, dill, annotated-types, aiohappyeyeballs, yarl, typing-inspection, scikit-learn, pydantic-core, pandas, multiprocess, huggingface-hub, httpcore, anyio, aiosignal, tokenizers, pydantic, httpx, aiohttp, accelerate, transformers, openai, datasets
+  Attempting uninstall: typing-extensions
+    Found existing installation: typing_extensions 4.14.0
+    Uninstalling typing_extensions-4.14.0:
+      Successfully uninstalled typing_extensions-4.14.0
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2025.5.1
+    Uninstalling fsspec-2025.5.1:
+      Successfully uninstalled fsspec-2025.5.1
+
+Successfully installed accelerate-1.14.0 aiohappyeyeballs-2.7.1 aiohttp-3.14.3 aiosignal-1.4.0 annotated-types-0.8.0 anyio-4.14.2 datasets-3.6.0 dill-0.3.8 frozenlist-1.8.0 fsspec-2025.3.0 h11-0.16.0 hf-xet-1.6.0 httpcore-1.0.9 httpx-0.28.1 huggingface-hub-0.36.2 jiter-0.16.0 joblib-1.5.3 multidict-6.7.1 multiprocess-0.70.16 narwhals-2.24.0 openai-1.109.1 pandas-3.0.5 propcache-0.5.2 pyarrow-25.0.1 pydantic-2.13.4 pydantic-core-2.46.4 python-dateutil-2.9.0.post0 regex-2026.7.19 safetensors-0.8.0 scikit-learn-1.9.0 scipy-1.17.1 sniffio-1.3.1 threadpoolctl-3.6.0 tokenizers-0.20.3 transformers-4.46.3 typing-extensions-4.16.0 typing-inspection-0.4.4 xxhash-4.0.1 yarl-1.24.5
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Scoring /results/results/wahm-generations/a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e/allam/generations.csv
+wrote /results/results/wahm-generations/a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e/allam/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 4, 'defer': 296} (300 attempts -> 300 canonical generations)
+wrote /results/results/wahm-generations/a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e/allam/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 296/300 rows
+{"decisions": {"clean": 190, "degeneration": 4, "factual_hallucination": 106}, "generations": "/results/results/wahm-generations/a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e/allam/generations.csv", "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305", "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895", "rows": 300, "rows_by_variety": {"msa": 300}, "score_commit": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "scores_sha256": "659700d7b4f9c47f3f6de12a8e3fc499cd994c31505c3545cb795e6c7cc94feb"}
+Scoring /results/results/wahm-generations/allam-a28dd1e-48f4644/allam/generations.csv
+wrote /results/results/wahm-generations/allam-a28dd1e-48f4644/allam/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 11, 'defer': 1489} (1500 attempts -> 1500 canonical generations)
+wrote /results/results/wahm-generations/allam-a28dd1e-48f4644/allam/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 1489/1500 rows
+{"decisions": {"clean": 933, "degeneration": 11, "factual_hallucination": 556}, "generations": "/results/results/wahm-generations/allam-a28dd1e-48f4644/allam/generations.csv", "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305", "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895", "rows": 1500, "rows_by_variety": {"egyptian": 300, "gulf": 300, "levantine": 300, "msa": 300, "sudanese": 300}, "score_commit": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "scores_sha256": "4b3b9d40ad539f645d015b69b788d7089333498051ce095ec5759a36ffd77353"}
+Scoring /results/results/wahm-generations/fanar1-d33480e-3998fbc/fanar/generations.csv
+wrote /results/results/wahm-generations/fanar1-d33480e-3998fbc/fanar/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 97, 'defer': 1403} (1500 attempts -> 1500 canonical generations)
+wrote /results/results/wahm-generations/fanar1-d33480e-3998fbc/fanar/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 1403/1500 rows
+{"decisions": {"clean": 241, "degeneration": 97, "factual_hallucination": 1162}, "generations": "/results/results/wahm-generations/fanar1-d33480e-3998fbc/fanar/generations.csv", "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305", "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895", "rows": 1500, "rows_by_variety": {"egyptian": 300, "gulf": 300, "levantine": 300, "msa": 300, "sudanese": 300}, "score_commit": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "scores_sha256": "de6ba2178f59acf4951ba5150cf91c786c4712dd4c37f7d673090ad9311cea6b"}
+Scoring /results/results/wahm-generations/fanar1-instruct-d30938d-d783d22/fanar/generations.csv
+wrote /results/results/wahm-generations/fanar1-instruct-d30938d-d783d22/fanar/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 0, 'defer': 1500} (1500 attempts -> 1500 canonical generations)
+wrote /results/results/wahm-generations/fanar1-instruct-d30938d-d783d22/fanar/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 1500/1500 rows
+{"decisions": {"clean": 833, "factual_hallucination": 667}, "generations": "/results/results/wahm-generations/fanar1-instruct-d30938d-d783d22/fanar/generations.csv", "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305", "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895", "rows": 1500, "rows_by_variety": {"egyptian": 300, "gulf": 300, "levantine": 300, "msa": 300, "sudanese": 300}, "score_commit": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "scores_sha256": "6bf24e93173aa8351445368a7bdb9fe2d3079db2d8488fddd8a506c049175fad"}
+Scoring /results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/generations.csv
+wrote /results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 1, 'defer': 1499} (1504 attempts -> 1500 canonical generations)
+wrote /results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 1499/1500 rows
+Row-count mismatch for /results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/generations.csv
+Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+Get:3 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1314 kB]
+Get:4 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [7569 kB]
+Get:5 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [84.1 kB]
+Get:6 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [4202 kB]
+Get:7 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Get:9 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+Get:12 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [4563 kB]
+Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1617 kB]
+Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [92.7 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [7914 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [82.8 kB]
+Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.6 kB]
+Fetched 47.8 MB in 4s (11.9 MB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1 libgdbm-compat4
+  libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34 libpsl5 librtmp1 libsasl2-2
+  libsasl2-modules-db libssh-4 perl perl-base perl-modules-5.34
+Suggested packages:
+  gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui
+  gitk gitweb git-cvs git-mediawiki git-svn gdbm-l10n perl-doc
+  libterm-readline-gnu-perl | libterm-readline-perl-perl make
+  libtap-harness-archive-perl
+Recommended packages:
+  patch less ssh-client libldap-common publicsuffix libsasl2-modules netbase
+The following NEW packages will be installed:
+  git git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1
+  libgdbm-compat4 libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34 libpsl5
+  librtmp1 libsasl2-2 libsasl2-modules-db libssh-4 perl perl-modules-5.34
+The following packages will be upgraded:
+  ca-certificates perl-base
+2 upgraded, 18 newly installed, 0 to remove and 45 not upgraded.
+Need to get 15.5 MB of archives.
+After this operation, 72.9 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-base amd64 5.34.0-3ubuntu1.7 [1763 kB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-modules-5.34 all 5.34.0-3ubuntu1.7 [2977 kB]
+Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm6 amd64 1.23-1 [33.9 kB]
+Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm-compat4 amd64 1.23-1 [6606 B]
+Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libperl5.34 amd64 5.34.0-3ubuntu1.7 [4817 kB]
+Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl amd64 5.34.0-3ubuntu1.7 [232 kB]
+Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates all 20260601~22.04.1 [141 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libexpat1 amd64 2.4.7-1ubuntu0.7 [92.1 kB]
+Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnghttp2-14 amd64 1.43.0-1ubuntu0.4 [76.9 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpsl5 amd64 0.21.0-1.2build2 [58.4 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbrotli1 amd64 1.0.9-2build6 [315 kB]
+Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg2-3ubuntu1.2 [20.5 kB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg2-3ubuntu1.2 [53.8 kB]
+Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-2.5-0 amd64 2.5.20+dfsg-0ubuntu0.22.04.1 [184 kB]
+Get:15 http://archive.ubuntu.com/ubuntu jammy/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build4 [58.2 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libssh-4 amd64 0.9.6-2ubuntu0.22.04.7 [187 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl3-gnutls amd64 7.81.0-1ubuntu1.25 [284 kB]
+Get:18 http://archive.ubuntu.com/ubuntu jammy/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+Get:19 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git-man all 1:2.34.1-1ubuntu1.17 [954 kB]
+Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git amd64 1:2.34.1-1ubuntu1.17 [3174 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 15.5 MB in 1s (18.3 MB/s)
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6651 files and directories currently installed.)
+Preparing to unpack .../perl-base_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking perl-base (5.34.0-3ubuntu1.7) over (5.34.0-3ubuntu1.4) ...
+Setting up perl-base (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package perl-modules-5.34.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6651 files and directories currently installed.)
+Preparing to unpack .../00-perl-modules-5.34_5.34.0-3ubuntu1.7_all.deb ...
+Unpacking perl-modules-5.34 (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package libgdbm6:amd64.
+Preparing to unpack .../01-libgdbm6_1.23-1_amd64.deb ...
+Unpacking libgdbm6:amd64 (1.23-1) ...
+Selecting previously unselected package libgdbm-compat4:amd64.
+Preparing to unpack .../02-libgdbm-compat4_1.23-1_amd64.deb ...
+Unpacking libgdbm-compat4:amd64 (1.23-1) ...
+Selecting previously unselected package libperl5.34:amd64.
+Preparing to unpack .../03-libperl5.34_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking libperl5.34:amd64 (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package perl.
+Preparing to unpack .../04-perl_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking perl (5.34.0-3ubuntu1.7) ...
+Preparing to unpack .../05-ca-certificates_20260601~22.04.1_all.deb ...
+Unpacking ca-certificates (20260601~22.04.1) over (20240203~22.04.1) ...
+Selecting previously unselected package libexpat1:amd64.
+Preparing to unpack .../06-libexpat1_2.4.7-1ubuntu0.7_amd64.deb ...
+Unpacking libexpat1:amd64 (2.4.7-1ubuntu0.7) ...
+Selecting previously unselected package libnghttp2-14:amd64.
+Preparing to unpack .../07-libnghttp2-14_1.43.0-1ubuntu0.4_amd64.deb ...
+Unpacking libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+Selecting previously unselected package libpsl5:amd64.
+Preparing to unpack .../08-libpsl5_0.21.0-1.2build2_amd64.deb ...
+Unpacking libpsl5:amd64 (0.21.0-1.2build2) ...
+Selecting previously unselected package libbrotli1:amd64.
+Preparing to unpack .../09-libbrotli1_1.0.9-2build6_amd64.deb ...
+Unpacking libbrotli1:amd64 (1.0.9-2build6) ...
+Selecting previously unselected package libsasl2-modules-db:amd64.
+Preparing to unpack .../10-libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Selecting previously unselected package libsasl2-2:amd64.
+Preparing to unpack .../11-libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+Unpacking libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Selecting previously unselected package libldap-2.5-0:amd64.
+Preparing to unpack .../12-libldap-2.5-0_2.5.20+dfsg-0ubuntu0.22.04.1_amd64.deb ...
+Unpacking libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+Selecting previously unselected package librtmp1:amd64.
+Preparing to unpack .../13-librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb ...
+Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+Selecting previously unselected package libssh-4:amd64.
+Preparing to unpack .../14-libssh-4_0.9.6-2ubuntu0.22.04.7_amd64.deb ...
+Unpacking libssh-4:amd64 (0.9.6-2ubuntu0.22.04.7) ...
+Selecting previously unselected package libcurl3-gnutls:amd64.
+Preparing to unpack .../15-libcurl3-gnutls_7.81.0-1ubuntu1.25_amd64.deb ...
+Unpacking libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.25) ...
+Selecting previously unselected package liberror-perl.
+Preparing to unpack .../16-liberror-perl_0.17029-1_all.deb ...
+Unpacking liberror-perl (0.17029-1) ...
+Selecting previously unselected package git-man.
+Preparing to unpack .../17-git-man_1%3a2.34.1-1ubuntu1.17_all.deb ...
+Unpacking git-man (1:2.34.1-1ubuntu1.17) ...
+Selecting previously unselected package git.
+Preparing to unpack .../18-git_1%3a2.34.1-1ubuntu1.17_amd64.deb ...
+Unpacking git (1:2.34.1-1ubuntu1.17) ...
+Setting up libexpat1:amd64 (2.4.7-1ubuntu0.7) ...
+Setting up libpsl5:amd64 (0.21.0-1.2build2) ...
+Setting up libbrotli1:amd64 (1.0.9-2build6) ...
+Setting up libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+Setting up perl-modules-5.34 (5.34.0-3ubuntu1.7) ...
+Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Setting up ca-certificates (20260601~22.04.1) ...
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+Updating certificates in /etc/ssl/certs...
+rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+14 added, 39 removed; done.
+Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+Setting up libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Setting up libssh-4:amd64 (0.9.6-2ubuntu0.22.04.7) ...
+Setting up git-man (1:2.34.1-1ubuntu1.17) ...
+Setting up libgdbm6:amd64 (1.23-1) ...
+Setting up libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+Setting up libgdbm-compat4:amd64 (1.23-1) ...
+Setting up libperl5.34:amd64 (5.34.0-3ubuntu1.7) ...
+Setting up libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.25) ...
+Setting up perl (5.34.0-3ubuntu1.7) ...
+Setting up liberror-perl (0.17029-1) ...
+Setting up git (1:2.34.1-1ubuntu1.17) ...
+Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
+Processing triggers for ca-certificates (20260601~22.04.1) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+Cloning into '/tmp/wahm'...
+HEAD is now at e9c5abb Record complete Judge training configuration
+Collecting openai<2,>=1.0 (from -r /tmp/wahm/requirements.txt (line 1))
+  Downloading openai-1.109.1-py3-none-any.whl.metadata (29 kB)
+Collecting accelerate<2,>=1.1 (from -r /tmp/wahm/requirements-judge.txt (line 2))
+  Downloading accelerate-1.14.0-py3-none-any.whl.metadata (19 kB)
+Collecting datasets<4,>=3 (from -r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading datasets-3.6.0-py3-none-any.whl.metadata (19 kB)
+Collecting scikit-learn<2,>=1.5 (from -r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading scikit_learn-1.9.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (11 kB)
+Requirement already satisfied: torch>=2.2 in /opt/conda/lib/python3.11/site-packages (from -r /tmp/wahm/requirements-judge.txt (line 5)) (2.7.1+cu118)
+Collecting transformers==4.46.3 (from -r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading transformers-4.46.3-py3-none-any.whl.metadata (44 kB)
+Requirement already satisfied: filelock in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (3.18.0)
+Collecting huggingface-hub<1.0,>=0.23.2 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading huggingface_hub-0.36.2-py3-none-any.whl.metadata (15 kB)
+Requirement already satisfied: numpy>=1.17 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.2.6)
+Requirement already satisfied: packaging>=20.0 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (25.0)
+Requirement already satisfied: pyyaml>=5.1 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (6.0.2)
+Collecting regex!=2019.12.17 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading regex-2026.7.19-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Requirement already satisfied: requests in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.32.3)
+Collecting tokenizers<0.21,>=0.20 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading tokenizers-0.20.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+Collecting safetensors>=0.4.1 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+Requirement already satisfied: tqdm>=4.27 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (4.67.1)
+Collecting anyio<5,>=3.5.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading anyio-4.14.2-py3-none-any.whl.metadata (4.6 kB)
+Requirement already satisfied: distro<2,>=1.7.0 in /opt/conda/lib/python3.11/site-packages (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (1.9.0)
+Collecting httpx<1,>=0.23.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting jiter<1,>=0.4.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading jiter-0.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+Collecting pydantic<3,>=1.9.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)
+Collecting sniffio (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Requirement already satisfied: typing-extensions<5,>=4.11 in /opt/conda/lib/python3.11/site-packages (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (4.14.0)
+Requirement already satisfied: psutil in /opt/conda/lib/python3.11/site-packages (from accelerate<2,>=1.1->-r /tmp/wahm/requirements-judge.txt (line 2)) (7.0.0)
+Collecting pyarrow>=15.0.0 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading pyarrow-25.0.1-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting dill<0.3.9,>=0.3.0 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading dill-0.3.8-py3-none-any.whl.metadata (10 kB)
+Collecting pandas (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading pandas-3.0.5-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting xxhash (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading xxhash-4.0.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (17 kB)
+Collecting multiprocess<0.70.17 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading multiprocess-0.70.16-py311-none-any.whl.metadata (7.2 kB)
+Collecting fsspec<=2025.3.0,>=2023.1.0 (from fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading fsspec-2025.3.0-py3-none-any.whl.metadata (11 kB)
+Collecting scipy>=1.10.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading scipy-1.17.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting joblib>=1.4.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading joblib-1.5.3-py3-none-any.whl.metadata (5.5 kB)
+Collecting narwhals>=2.0.1 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading narwhals-2.24.0-py3-none-any.whl.metadata (15 kB)
+Collecting threadpoolctl>=3.5.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+Requirement already satisfied: idna>=2.8 in /opt/conda/lib/python3.11/site-packages (from anyio<5,>=3.5.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (3.10)
+Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+Get:3 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [7569 kB]
+Get:4 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [4202 kB]
+Get:5 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1314 kB]
+Get:6 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [84.1 kB]
+Get:7 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Get:9 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+Get:12 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [7914 kB]
+Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1617 kB]
+Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [4563 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [92.7 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [82.8 kB]
+Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.6 kB]
+Fetched 47.8 MB in 4s (12.9 MB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1 libgdbm-compat4
+  libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34 libpsl5 librtmp1 libsasl2-2
+  libsasl2-modules-db libssh-4 perl perl-base perl-modules-5.34
+Suggested packages:
+  gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui
+  gitk gitweb git-cvs git-mediawiki git-svn gdbm-l10n perl-doc
+  libterm-readline-gnu-perl | libterm-readline-perl-perl make
+  libtap-harness-archive-perl
+Recommended packages:
+  patch less ssh-client libldap-common publicsuffix libsasl2-modules netbase
+The following NEW packages will be installed:
+  git git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1
+  libgdbm-compat4 libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34 libpsl5
+  librtmp1 libsasl2-2 libsasl2-modules-db libssh-4 perl perl-modules-5.34
+The following packages will be upgraded:
+  ca-certificates perl-base
+2 upgraded, 18 newly installed, 0 to remove and 45 not upgraded.
+Need to get 15.5 MB of archives.
+After this operation, 72.9 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-base amd64 5.34.0-3ubuntu1.7 [1763 kB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-modules-5.34 all 5.34.0-3ubuntu1.7 [2977 kB]
+Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm6 amd64 1.23-1 [33.9 kB]
+Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm-compat4 amd64 1.23-1 [6606 B]
+Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libperl5.34 amd64 5.34.0-3ubuntu1.7 [4817 kB]
+Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl amd64 5.34.0-3ubuntu1.7 [232 kB]
+Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates all 20260601~22.04.1 [141 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libexpat1 amd64 2.4.7-1ubuntu0.7 [92.1 kB]
+Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnghttp2-14 amd64 1.43.0-1ubuntu0.4 [76.9 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpsl5 amd64 0.21.0-1.2build2 [58.4 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbrotli1 amd64 1.0.9-2build6 [315 kB]
+Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg2-3ubuntu1.2 [20.5 kB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg2-3ubuntu1.2 [53.8 kB]
+Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-2.5-0 amd64 2.5.20+dfsg-0ubuntu0.22.04.1 [184 kB]
+Get:15 http://archive.ubuntu.com/ubuntu jammy/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build4 [58.2 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libssh-4 amd64 0.9.6-2ubuntu0.22.04.7 [187 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl3-gnutls amd64 7.81.0-1ubuntu1.25 [284 kB]
+Get:18 http://archive.ubuntu.com/ubuntu jammy/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+Get:19 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git-man all 1:2.34.1-1ubuntu1.17 [954 kB]
+Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git amd64 1:2.34.1-1ubuntu1.17 [3174 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 15.5 MB in 1s (22.7 MB/s)
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6651 files and directories currently installed.)
+Preparing to unpack .../perl-base_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking perl-base (5.34.0-3ubuntu1.7) over (5.34.0-3ubuntu1.4) ...
+Setting up perl-base (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package perl-modules-5.34.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6651 files and directories currently installed.)
+Preparing to unpack .../00-perl-modules-5.34_5.34.0-3ubuntu1.7_all.deb ...
+Unpacking perl-modules-5.34 (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package libgdbm6:amd64.
+Preparing to unpack .../01-libgdbm6_1.23-1_amd64.deb ...
+Unpacking libgdbm6:amd64 (1.23-1) ...
+Selecting previously unselected package libgdbm-compat4:amd64.
+Preparing to unpack .../02-libgdbm-compat4_1.23-1_amd64.deb ...
+Unpacking libgdbm-compat4:amd64 (1.23-1) ...
+Selecting previously unselected package libperl5.34:amd64.
+Preparing to unpack .../03-libperl5.34_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking libperl5.34:amd64 (5.34.0-3ubuntu1.7) ...
+Selecting previously unselected package perl.
+Preparing to unpack .../04-perl_5.34.0-3ubuntu1.7_amd64.deb ...
+Unpacking perl (5.34.0-3ubuntu1.7) ...
+Preparing to unpack .../05-ca-certificates_20260601~22.04.1_all.deb ...
+Unpacking ca-certificates (20260601~22.04.1) over (20240203~22.04.1) ...
+Selecting previously unselected package libexpat1:amd64.
+Preparing to unpack .../06-libexpat1_2.4.7-1ubuntu0.7_amd64.deb ...
+Unpacking libexpat1:amd64 (2.4.7-1ubuntu0.7) ...
+Selecting previously unselected package libnghttp2-14:amd64.
+Preparing to unpack .../07-libnghttp2-14_1.43.0-1ubuntu0.4_amd64.deb ...
+Unpacking libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+Selecting previously unselected package libpsl5:amd64.
+Preparing to unpack .../08-libpsl5_0.21.0-1.2build2_amd64.deb ...
+Unpacking libpsl5:amd64 (0.21.0-1.2build2) ...
+Selecting previously unselected package libbrotli1:amd64.
+Preparing to unpack .../09-libbrotli1_1.0.9-2build6_amd64.deb ...
+Unpacking libbrotli1:amd64 (1.0.9-2build6) ...
+Selecting previously unselected package libsasl2-modules-db:amd64.
+Preparing to unpack .../10-libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Selecting previously unselected package libsasl2-2:amd64.
+Preparing to unpack .../11-libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+Unpacking libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Selecting previously unselected package libldap-2.5-0:amd64.
+Preparing to unpack .../12-libldap-2.5-0_2.5.20+dfsg-0ubuntu0.22.04.1_amd64.deb ...
+Unpacking libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+Selecting previously unselected package librtmp1:amd64.
+Preparing to unpack .../13-librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb ...
+Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+Selecting previously unselected package libssh-4:amd64.
+Preparing to unpack .../14-libssh-4_0.9.6-2ubuntu0.22.04.7_amd64.deb ...
+Unpacking libssh-4:amd64 (0.9.6-2ubuntu0.22.04.7) ...
+Selecting previously unselected package libcurl3-gnutls:amd64.
+Preparing to unpack .../15-libcurl3-gnutls_7.81.0-1ubuntu1.25_amd64.deb ...
+Unpacking libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.25) ...
+Selecting previously unselected package liberror-perl.
+Preparing to unpack .../16-liberror-perl_0.17029-1_all.deb ...
+Unpacking liberror-perl (0.17029-1) ...
+Selecting previously unselected package git-man.
+Preparing to unpack .../17-git-man_1%3a2.34.1-1ubuntu1.17_all.deb ...
+Unpacking git-man (1:2.34.1-1ubuntu1.17) ...
+Selecting previously unselected package git.
+Preparing to unpack .../18-git_1%3a2.34.1-1ubuntu1.17_amd64.deb ...
+Unpacking git (1:2.34.1-1ubuntu1.17) ...
+Setting up libexpat1:amd64 (2.4.7-1ubuntu0.7) ...
+Setting up libpsl5:amd64 (0.21.0-1.2build2) ...
+Setting up libbrotli1:amd64 (1.0.9-2build6) ...
+Setting up libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+Setting up perl-modules-5.34 (5.34.0-3ubuntu1.7) ...
+Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Setting up ca-certificates (20260601~22.04.1) ...
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+Updating certificates in /etc/ssl/certs...
+rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+14 added, 39 removed; done.
+Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+Setting up libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+Setting up libssh-4:amd64 (0.9.6-2ubuntu0.22.04.7) ...
+Setting up git-man (1:2.34.1-1ubuntu1.17) ...
+Setting up libgdbm6:amd64 (1.23-1) ...
+Setting up libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+Setting up libgdbm-compat4:amd64 (1.23-1) ...
+Setting up libperl5.34:amd64 (5.34.0-3ubuntu1.7) ...
+Setting up libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.25) ...
+Setting up perl (5.34.0-3ubuntu1.7) ...
+Setting up liberror-perl (0.17029-1) ...
+Setting up git (1:2.34.1-1ubuntu1.17) ...
+Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
+Processing triggers for ca-certificates (20260601~22.04.1) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+Cloning into '/tmp/wahm'...
+HEAD is now at 815600a Handle retried generation attempts in bulk rescoring
+Collecting openai<2,>=1.0 (from -r /tmp/wahm/requirements.txt (line 1))
+  Downloading openai-1.109.1-py3-none-any.whl.metadata (29 kB)
+Collecting accelerate<2,>=1.1 (from -r /tmp/wahm/requirements-judge.txt (line 2))
+  Downloading accelerate-1.14.0-py3-none-any.whl.metadata (19 kB)
+Collecting datasets<4,>=3 (from -r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading datasets-3.6.0-py3-none-any.whl.metadata (19 kB)
+Collecting scikit-learn<2,>=1.5 (from -r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading scikit_learn-1.9.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (11 kB)
+Requirement already satisfied: torch>=2.2 in /opt/conda/lib/python3.11/site-packages (from -r /tmp/wahm/requirements-judge.txt (line 5)) (2.7.1+cu118)
+Collecting transformers==4.46.3 (from -r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading transformers-4.46.3-py3-none-any.whl.metadata (44 kB)
+Requirement already satisfied: filelock in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (3.18.0)
+Collecting huggingface-hub<1.0,>=0.23.2 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading huggingface_hub-0.36.2-py3-none-any.whl.metadata (15 kB)
+Requirement already satisfied: numpy>=1.17 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.2.6)
+Requirement already satisfied: packaging>=20.0 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (25.0)
+Requirement already satisfied: pyyaml>=5.1 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (6.0.2)
+Collecting regex!=2019.12.17 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading regex-2026.7.19-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Requirement already satisfied: requests in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.32.3)
+Collecting tokenizers<0.21,>=0.20 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading tokenizers-0.20.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+Collecting safetensors>=0.4.1 (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+Requirement already satisfied: tqdm>=4.27 in /opt/conda/lib/python3.11/site-packages (from transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (4.67.1)
+Collecting anyio<5,>=3.5.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading anyio-4.14.2-py3-none-any.whl.metadata (4.6 kB)
+Requirement already satisfied: distro<2,>=1.7.0 in /opt/conda/lib/python3.11/site-packages (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (1.9.0)
+Collecting httpx<1,>=0.23.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting jiter<1,>=0.4.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading jiter-0.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+Collecting pydantic<3,>=1.9.0 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)
+Collecting sniffio (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Requirement already satisfied: typing-extensions<5,>=4.11 in /opt/conda/lib/python3.11/site-packages (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (4.14.0)
+Requirement already satisfied: psutil in /opt/conda/lib/python3.11/site-packages (from accelerate<2,>=1.1->-r /tmp/wahm/requirements-judge.txt (line 2)) (7.0.0)
+Collecting pyarrow>=15.0.0 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading pyarrow-25.0.1-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting dill<0.3.9,>=0.3.0 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading dill-0.3.8-py3-none-any.whl.metadata (10 kB)
+Collecting pandas (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading pandas-3.0.5-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting xxhash (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading xxhash-4.0.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (17 kB)
+Collecting multiprocess<0.70.17 (from datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading multiprocess-0.70.16-py311-none-any.whl.metadata (7.2 kB)
+Collecting fsspec<=2025.3.0,>=2023.1.0 (from fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading fsspec-2025.3.0-py3-none-any.whl.metadata (11 kB)
+Collecting scipy>=1.10.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading scipy-1.17.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting joblib>=1.4.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading joblib-1.5.3-py3-none-any.whl.metadata (5.5 kB)
+Collecting narwhals>=2.0.1 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading narwhals-2.24.0-py3-none-any.whl.metadata (15 kB)
+Collecting threadpoolctl>=3.5.0 (from scikit-learn<2,>=1.5->-r /tmp/wahm/requirements-judge.txt (line 4))
+  Downloading threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+Requirement already satisfied: idna>=2.8 in /opt/conda/lib/python3.11/site-packages (from anyio<5,>=3.5.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (3.10)
+Collecting aiohttp!=4.0.0a0,!=4.0.0a1 (from fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading aiohttp-3.14.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Requirement already satisfied: certifi in /opt/conda/lib/python3.11/site-packages (from httpx<1,>=0.23.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1)) (2025.4.26)
+Collecting httpcore==1.* (from httpx<1,>=0.23.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.23.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting hf-xet<2.0.0,>=1.1.3 (from huggingface-hub<1.0,>=0.23.2->transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6))
+  Downloading hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.46.4 (from pydantic<3,>=1.9.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading pydantic_core-2.46.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+Collecting typing-extensions<5,>=4.11 (from openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->openai<2,>=1.0->-r /tmp/wahm/requirements.txt (line 1))
+  Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Requirement already satisfied: sympy>=1.13.3 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (1.14.0)
+Requirement already satisfied: networkx in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.5)
+Requirement already satisfied: jinja2 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.1.6)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu11==11.8.89 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.89)
+Requirement already satisfied: nvidia-cuda-runtime-cu11==11.8.89 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.89)
+Requirement already satisfied: nvidia-cuda-cupti-cu11==11.8.87 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.87)
+Requirement already satisfied: nvidia-cudnn-cu11==9.1.0.70 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (9.1.0.70)
+Requirement already satisfied: nvidia-cublas-cu11==11.11.3.6 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.11.3.6)
+Requirement already satisfied: nvidia-cufft-cu11==10.9.0.58 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (10.9.0.58)
+Requirement already satisfied: nvidia-curand-cu11==10.3.0.86 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (10.3.0.86)
+Requirement already satisfied: nvidia-cusolver-cu11==11.4.1.48 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.4.1.48)
+Requirement already satisfied: nvidia-cusparse-cu11==11.7.5.86 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.7.5.86)
+Requirement already satisfied: nvidia-nccl-cu11==2.21.5 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (2.21.5)
+Requirement already satisfied: nvidia-nvtx-cu11==11.8.86 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (11.8.86)
+Requirement already satisfied: triton==3.3.1 in /opt/conda/lib/python3.11/site-packages (from torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.3.1)
+Requirement already satisfied: setuptools>=40.8.0 in /opt/conda/lib/python3.11/site-packages (from triton==3.3.1->torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (75.8.2)
+Collecting aiohappyeyeballs>=2.5.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiosignal>=1.4.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Requirement already satisfied: attrs>=17.3.0 in /opt/conda/lib/python3.11/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3)) (25.3.0)
+Collecting frozenlist>=1.1.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+Collecting propcache>=0.2.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading propcache-0.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (16 kB)
+Collecting yarl<2.0,>=1.17.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading yarl-1.24.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (103 kB)
+Requirement already satisfied: charset_normalizer<4,>=2 in /opt/conda/lib/python3.11/site-packages (from requests->transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (3.4.2)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.11/site-packages (from requests->transformers==4.46.3->-r /tmp/wahm/requirements-judge.txt (line 6)) (2.4.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /opt/conda/lib/python3.11/site-packages (from sympy>=1.13.3->torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /opt/conda/lib/python3.11/site-packages (from jinja2->torch>=2.2->-r /tmp/wahm/requirements-judge.txt (line 5)) (3.0.2)
+Collecting python-dateutil>=2.8.2 (from pandas->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3))
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.11/site-packages (from python-dateutil>=2.8.2->pandas->datasets<4,>=3->-r /tmp/wahm/requirements-judge.txt (line 3)) (1.17.0)
+Downloading transformers-4.46.3-py3-none-any.whl (10.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.0/10.0 MB 119.3 MB/s eta 0:00:00
+Downloading openai-1.109.1-py3-none-any.whl (948 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 948.6/948.6 kB 374.8 MB/s eta 0:00:00
+Downloading accelerate-1.14.0-py3-none-any.whl (389 kB)
+Downloading datasets-3.6.0-py3-none-any.whl (491 kB)
+Downloading scikit_learn-1.9.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.3/9.3 MB 182.7 MB/s eta 0:00:00
+Downloading anyio-4.14.2-py3-none-any.whl (125 kB)
+Downloading dill-0.3.8-py3-none-any.whl (116 kB)
+Downloading fsspec-2025.3.0-py3-none-any.whl (193 kB)
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+Downloading huggingface_hub-0.36.2-py3-none-any.whl (566 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.4/566.4 kB 254.0 MB/s eta 0:00:00
+Downloading hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 217.9 MB/s eta 0:00:00
+Downloading jiter-0.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (347 kB)
+Downloading multiprocess-0.70.16-py311-none-any.whl (143 kB)
+Downloading pydantic-2.13.4-py3-none-any.whl (472 kB)
+Downloading pydantic_core-2.46.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 225.5 MB/s eta 0:00:00
+Downloading tokenizers-0.20.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 99.5 MB/s eta 0:00:00
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Downloading aiohttp-3.14.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 210.5 MB/s eta 0:00:00
+Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (246 kB)
+Downloading yarl-1.24.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (111 kB)
+Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (231 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading joblib-1.5.3-py3-none-any.whl (309 kB)
+Downloading narwhals-2.24.0-py3-none-any.whl (461 kB)
+Downloading propcache-0.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (58 kB)
+Downloading pyarrow-25.0.1-cp311-cp311-manylinux_2_28_x86_64.whl (50.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.1/50.1 MB 105.1 MB/s eta 0:00:00
+Downloading regex-2026.7.19-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (801 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 801.4/801.4 kB 34.5 MB/s eta 0:00:00
+Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (516 kB)
+Downloading scipy-1.17.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.3/35.3 MB 26.2 MB/s eta 0:00:00
+Downloading threadpoolctl-3.6.0-py3-none-any.whl (18 kB)
+Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Downloading pandas-3.0.5-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (11.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.3/11.3 MB 19.3 MB/s eta 0:00:00
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+Downloading xxhash-4.0.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (261 kB)
+Installing collected packages: xxhash, typing-extensions, threadpoolctl, sniffio, scipy, safetensors, regex, python-dateutil, pyarrow, propcache, narwhals, multidict, joblib, jiter, hf-xet, h11, fsspec, frozenlist, dill, annotated-types, aiohappyeyeballs, yarl, typing-inspection, scikit-learn, pydantic-core, pandas, multiprocess, huggingface-hub, httpcore, anyio, aiosignal, tokenizers, pydantic, httpx, aiohttp, accelerate, transformers, openai, datasets
+  Attempting uninstall: typing-extensions
+    Found existing installation: typing_extensions 4.14.0
+    Uninstalling typing_extensions-4.14.0:
+      Successfully uninstalled typing_extensions-4.14.0
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2025.5.1
+    Uninstalling fsspec-2025.5.1:
+      Successfully uninstalled fsspec-2025.5.1
+
+Successfully installed accelerate-1.14.0 aiohappyeyeballs-2.7.1 aiohttp-3.14.3 aiosignal-1.4.0 annotated-types-0.8.0 anyio-4.14.2 datasets-3.6.0 dill-0.3.8 frozenlist-1.8.0 fsspec-2025.3.0 h11-0.16.0 hf-xet-1.6.0 httpcore-1.0.9 httpx-0.28.1 huggingface-hub-0.36.2 jiter-0.16.0 joblib-1.5.3 multidict-6.7.1 multiprocess-0.70.16 narwhals-2.24.0 openai-1.109.1 pandas-3.0.5 propcache-0.5.2 pyarrow-25.0.1 pydantic-2.13.4 pydantic-core-2.46.4 python-dateutil-2.9.0.post0 regex-2026.7.19 safetensors-0.8.0 scikit-learn-1.9.0 scipy-1.17.1 sniffio-1.3.1 threadpoolctl-3.6.0 tokenizers-0.20.3 transformers-4.46.3 typing-extensions-4.16.0 typing-inspection-0.4.4 xxhash-4.0.1 yarl-1.24.5
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Already complete; skipping /results/results/wahm-generations/a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e/allam/generations.csv
+Already complete; skipping /results/results/wahm-generations/allam-a28dd1e-48f4644/allam/generations.csv
+Already complete; skipping /results/results/wahm-generations/fanar1-d33480e-3998fbc/fanar/generations.csv
+Already complete; skipping /results/results/wahm-generations/fanar1-instruct-d30938d-d783d22/fanar/generations.csv
+Scoring /results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/generations.csv
+wrote /results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 1, 'defer': 1499} (1504 attempts -> 1500 canonical generations)
+wrote /results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 1499/1500 rows
+{"decisions": {"clean": 921, "degeneration": 1, "factual_hallucination": 578}, "generations": "/results/results/wahm-generations/gpt55-20260424-c5347c9/gpt55/generations.csv", "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305", "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895", "rows": 1500, "rows_by_variety": {"egyptian": 300, "gulf": 300, "levantine": 300, "msa": 300, "sudanese": 300}, "score_commit": "815600abe59a7565e65357b6169b5589e08c532d", "scores_sha256": "5bfaced7d86421ad48188556c13fe51f4c58f6db0d4f8aa45dc67ffdb50ca606"}
+Scoring /results/results/wahm-generations/jais2-f7df1cb-bbd2ffe/jais/generations.csv
+wrote /results/results/wahm-generations/jais2-f7df1cb-bbd2ffe/jais/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 0, 'defer': 1500} (1500 attempts -> 1500 canonical generations)
+wrote /results/results/wahm-generations/jais2-f7df1cb-bbd2ffe/jais/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 1500/1500 rows
+{"decisions": {"clean": 749, "factual_hallucination": 751}, "generations": "/results/results/wahm-generations/jais2-f7df1cb-bbd2ffe/jais/generations.csv", "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305", "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895", "rows": 1500, "rows_by_variety": {"egyptian": 300, "gulf": 300, "levantine": 300, "msa": 300, "sudanese": 300}, "score_commit": "815600abe59a7565e65357b6169b5589e08c532d", "scores_sha256": "85b4692c5ceafc2d2dfb845c9c55e7c1c33f75d62c24cb923cee17cdbfba822e"}
+Scoring /results/results/wahm-generations/qwen3-8b-b968826-64776fa/qwen3-8b/generations.csv
+wrote /results/results/wahm-generations/qwen3-8b-b968826-64776fa/qwen3-8b/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_layer1.csv: {'degeneration': 97, 'defer': 1403} (1500 attempts -> 1500 canonical generations)
+wrote /results/results/wahm-generations/qwen3-8b-b968826-64776fa/qwen3-8b/judge_v2/e9c5abbf2048c7e2d5762036b722aebc154e7295/scores_combined.csv: Layer 2 scored 1403/1500 rows
+{"decisions": {"clean": 262, "degeneration": 97, "factual_hallucination": 1141}, "generations": "/results/results/wahm-generations/qwen3-8b-b968826-64776fa/qwen3-8b/generations.csv", "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305", "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295", "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895", "rows": 1500, "rows_by_variety": {"egyptian": 300, "gulf": 300, "levantine": 300, "msa": 300, "sudanese": 300}, "score_commit": "815600abe59a7565e65357b6169b5589e08c532d", "scores_sha256": "abd501268fe871c185b7f0ebfc538b807cd686925e9ac1150dda90daccc678c5"}

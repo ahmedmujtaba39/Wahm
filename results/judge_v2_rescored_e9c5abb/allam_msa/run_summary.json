@@ -1,0 +1,17 @@
+{
+  "decisions": {
+    "clean": 190,
+    "degeneration": 4,
+    "factual_hallucination": 106
+  },
+  "generations": "/results/results/wahm-generations/a049913a1f18a7247cd3cdbf4d36dfcd41b0fe6e/allam/generations.csv",
+  "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305",
+  "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295",
+  "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895",
+  "rows": 300,
+  "rows_by_variety": {
+    "msa": 300
+  },
+  "score_commit": "e9c5abbf2048c7e2d5762036b722aebc154e7295",
+  "scores_sha256": "659700d7b4f9c47f3f6de12a8e3fc499cd994c31505c3545cb795e6c7cc94feb"
+}
