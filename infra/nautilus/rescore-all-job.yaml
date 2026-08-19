@@ -117,6 +117,27 @@ spec:
               print(json.dumps(summary, sort_keys=True))
               PY
               done
+              WAHM_MANIFEST="${manifest}" python - <<'PY'
+              import json
+              import os
+              from pathlib import Path
+
+              root = Path("/results/results/wahm-generations")
+              run = os.environ["WAHM_JUDGE_RUN"]
+              summaries = sorted(root.glob(f"**/judge_v2/{run}/run_summary.json"))
+              if len(summaries) != len(generation_files := list(
+                      root.glob("**/generations.csv"))):
+                  raise SystemExit(
+                      f"Incomplete manifest: {len(summaries)} summaries for "
+                      f"{len(generation_files)} generation files")
+              manifest = Path(os.environ["WAHM_MANIFEST"])
+              manifest.write_text(
+                  "".join(json.dumps(json.loads(path.read_text(encoding="utf-8")),
+                                     sort_keys=True) + "\n"
+                          for path in summaries),
+                  encoding="utf-8",
+              )
+              PY
               echo "Scored ${#generation_files[@]} generation files" > /dev/termination-log
           env:
             - name: WAHM_GIT_REPOSITORY

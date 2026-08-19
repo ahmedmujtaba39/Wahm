@@ -440,6 +440,24 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(result["n_degenerated_msa"], 1)
         self.assertEqual(result["mcnemar_exact_p"], 1.0)
 
+    def test_analysis_run_keeps_same_reported_model_runs_separate(self):
+        def row(run, qid, variety, decision):
+            return {"qid": qid, "variety": variety, "condition": "direct",
+                    "model": "fanar", "analysis_run": run,
+                    "family": "arabic_centric",
+                    "combined_decision": decision, "degeneration_reasons": ""}
+
+        rows = [
+            row("fanar", "q1", "msa", "clean"),
+            row("fanar", "q1", "gulf", "factual_hallucination"),
+            row("fanar_instruct", "q1", "msa", "factual_hallucination"),
+            row("fanar_instruct", "q1", "gulf", "clean"),
+        ]
+        results = analyze_results.analyze(rows, bootstrap_iterations=100)
+        self.assertEqual({result["model"] for result in results},
+                         {"fanar", "fanar_instruct"})
+        self.assertEqual({result["hds"] for result in results}, {1.0, -1.0})
+
 
 class LayerThreeTests(unittest.TestCase):
     def test_kappa_is_one_for_identical_labels(self):

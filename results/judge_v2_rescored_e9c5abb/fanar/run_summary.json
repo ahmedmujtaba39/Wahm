@@ -1,0 +1,21 @@
+{
+  "decisions": {
+    "clean": 241,
+    "degeneration": 97,
+    "factual_hallucination": 1162
+  },
+  "generations": "/results/results/wahm-generations/fanar1-d33480e-3998fbc/fanar/generations.csv",
+  "judge_metadata_sha256": "579273c192d3a39092e31c60b8dc64dc5c637d46c8b7f485b33e0e5bedba3305",
+  "judge_run": "e9c5abbf2048c7e2d5762036b722aebc154e7295",
+  "judge_weights_sha256": "04115c581e64be35a1e4ffc705e0ff4bec8d77110a6395dfe144b6eeb3e7c895",
+  "rows": 1500,
+  "rows_by_variety": {
+    "egyptian": 300,
+    "gulf": 300,
+    "levantine": 300,
+    "msa": 300,
+    "sudanese": 300
+  },
+  "score_commit": "e9c5abbf2048c7e2d5762036b722aebc154e7295",
+  "scores_sha256": "de6ba2178f59acf4951ba5150cf91c786c4712dd4c37f7d673090ad9311cea6b"
+}

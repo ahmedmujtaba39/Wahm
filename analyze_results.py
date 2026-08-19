@@ -71,7 +71,8 @@ def _mcnemar_exact_p(clean_to_hallucination, hallucination_to_clean):
 def analyze(rows, bootstrap_iterations=2000, seed=42):
     indexed = {}
     for row in rows:
-        key = (row["model"], row["variety"], row["condition"], row["qid"])
+        model = row.get("analysis_run") or row["model"]
+        key = (model, row["variety"], row["condition"], row["qid"])
         indexed[key] = row
 
     arms = defaultdict(set)
@@ -176,10 +177,15 @@ def run(input_paths="scores_combined.csv",
         bootstrap_iterations=2000, seed=42):
     if isinstance(input_paths, (str, Path)):
         input_paths = [input_paths]
+    input_paths = list(input_paths)
     rows = []
     for input_path in input_paths:
         with open(input_path, encoding="utf-8-sig", newline="") as source:
-            rows.extend(csv.DictReader(source))
+            for row in csv.DictReader(source):
+                record = dict(row)
+                if len(input_paths) > 1:
+                    record["analysis_run"] = Path(input_path).parent.name
+                rows.append(record)
     results = analyze(rows, bootstrap_iterations, seed)
     if not results:
         raise SystemExit("ERROR: no paired dialect/MSA results were available")
