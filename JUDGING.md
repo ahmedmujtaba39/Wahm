@@ -20,20 +20,18 @@ that label.
 
 ## Layer 1
 
-`score_layer1.py` applies two transparent checks:
+`score_layer1.py` is a mechanical router, not a factual judge. It sends an
+answer to the separate `degeneration` outcome only for observable generation
+failures: an explicit generation error, an empty answer, foreign CJK/Hangul
+script, role markers, code fences, or heavy repeated token sequences. Every
+other answer is deferred to Layer 2.
 
-1. Degeneration detection: foreign CJK/Hangul script, role markers, code
-   fences, or heavy repeated token sequences are labeled hallucinated.
-2. Gold-token coverage after Arabic normalization and conservative proclitic
-   handling:
-   - coverage >= 0.9: clean;
-   - coverage = 0: hallucinated;
-   - otherwise: defer to Layer 2.
-
-Against all 4,195 usable source labels, this implementation resolves 2,580
-answers (61.5%) with 81.8% accuracy on resolved rows. These values are recorded
-in `results/layer1_arahallueval.json`. They measure agreement with the noisy
-source labels, not dialect generalization.
+Normalized gold-token coverage is retained as a diagnostic feature only. It
+must never determine the label: zero coverage can be caused by morphology,
+spelling, or dialectal wording, while high coverage can coexist with an
+unsupported extra claim. The pre-v2 coverage rules and their source-label
+agreement in `results/layer1_arahallueval.json` are historical development
+results and must not be used for final WAHM scores.
 
 ## Layer 2 development split
 
@@ -88,40 +86,48 @@ python score_layer2.py --model arabert_judge_gold_answer
 ```
 
 Layer 2 scores only deferred rows. Its threshold is read from the model's
-`judge_metadata.json`; silently falling back to 0.5 is prohibited. Layer 1
-labels pass through unchanged. The resulting `scores_combined.csv` contains the
-route, Layer 2 probability where applicable, final decision, and binary label.
+`judge_metadata.json`; silently falling back to 0.5 is prohibited. The
+resulting `scores_combined.csv` contains the route, Layer 2 probability where
+applicable, threshold, final decision, and labels. Final decisions are
+`clean`, `factual_hallucination`, or `degeneration`. `combined_label` is the
+binary factual label and is intentionally blank for degeneration;
+`headline_failure_label` treats either factual hallucination or degeneration
+as a failed response.
 
-## Layer 3 dialect validation
+## Human validation
 
-After WAHM generations are scored:
+After all WAHM generations are rescored with one frozen Judge v2 checkpoint:
 
 ```powershell
-python prepare_layer3.py --per-dialect 150
+python prepare_judge_audit.py --inputs results/*/scores_combined.csv --size 250
 ```
 
-For every dialect this creates two independently shuffled, blinded annotation
-sheets and a private key. Validator sheets contain the question, MSA gold, and
-model answer but not the model identity, automatic label, probability, or judge
-route.
+This creates two independently shuffled, blinded annotation sheets and a
+private key. Sampling is stratified across variety, judge route, predicted
+label, and distance from the Layer 2 threshold. Validators assign one of
+`clean`, `factual_hallucination`, or `degeneration` and may record a factual
+error type. The packet must contain 200--300 rows; the default is 250.
 
 After both validators return their files:
 
 ```powershell
-python evaluate_layer3.py `
-  --key layer3/layer3_gulf_key.csv `
-  --validator-a layer3/layer3_gulf_validator_a.csv `
-  --validator-b layer3/layer3_gulf_validator_b.csv `
-  --output results/layer3_gulf_agreement.json
+python evaluate_judge_audit.py `
+  --key audit/judge_v2_audit_key.csv `
+  --validator-a audit/judge_v2_validator_a.csv `
+  --validator-b audit/judge_v2_validator_b.csv `
+  --output results/judge_v2_audit_metrics.json
 ```
 
-Report inter-annotator kappa, raw agreement, pipeline agreement with each
-validator, pipeline agreement on human-consensus rows, annotation coverage,
-and the number requiring adjudication. Do not inspect the private automatic
-label key while annotating.
+Report inter-annotator kappa, raw agreement, three-class macro F1 and per-class
+precision/recall/F1, the confusion matrix, annotation coverage, and the number
+requiring adjudication. Do not inspect the private automatic-label key while
+annotating.
 
 ## Final analysis
 
-`analyze_results.py` calculates hallucination rates, HDS, hallucination-set IoU,
-and degeneration rate. Every dialect arm is compared with MSA on the exact same
-QIDs. The MSA `direct` arm is the baseline for every dialect condition.
+`analyze_results.py` calculates paired factual hallucination rates, HDS,
+degeneration rates, paired transitions, deterministic paired-bootstrap 95%
+confidence intervals, and exact two-sided McNemar tests. Every dialect arm is
+compared with MSA on the exact same QIDs. Factual HR and HDS exclude pairs where
+either response is degeneration; headline failure rates retain them. The MSA
+`direct` arm is the baseline for every dialect condition.

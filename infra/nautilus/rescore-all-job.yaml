@@ -1,0 +1,140 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wahm-judge-v2-rescore-all
+  namespace: aiea-interns
+  labels:
+    app.kubernetes.io/name: wahm
+    wahm/stage: judge-v2-rescore
+spec:
+  activeDeadlineSeconds: 21600
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wahm
+        wahm/stage: judge-v2-rescore
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: score
+          image: pytorch/pytorch:2.7.1-cuda11.8-cudnn9-runtime
+          command: ["/bin/bash", "-lc"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update
+              apt-get install -y --no-install-recommends git ca-certificates
+              rm -rf /var/lib/apt/lists/*
+              git clone "${WAHM_GIT_REPOSITORY}" /tmp/wahm
+              git -C /tmp/wahm checkout --detach "${WAHM_GIT_COMMIT}"
+              python -m pip install --no-cache-dir -r /tmp/wahm/requirements-judge.txt
+
+              model_dir="/judge/results/wahm-judge/${WAHM_JUDGE_RUN}/arabert-gold-answer"
+              test -s "${model_dir}/model.safetensors"
+              test -s "${model_dir}/judge_metadata.json"
+              cd /tmp/wahm
+
+              mapfile -d '' generation_files < <(
+                find /results/results/wahm-generations -type f -name generations.csv -print0 | sort -z
+              )
+              if [[ ${#generation_files[@]} -eq 0 ]]; then
+                echo "No generation files found" >&2
+                exit 1
+              fi
+
+              manifest="/results/results/wahm-generations/judge-v2-${WAHM_JUDGE_RUN}.jsonl"
+              : > "${manifest}"
+              for generations in "${generation_files[@]}"; do
+                run_dir=$(dirname "${generations}")
+                output_dir="${run_dir}/judge_v2/${WAHM_JUDGE_RUN}"
+                mkdir -p "${output_dir}"
+                echo "Scoring ${generations}"
+                python score_layer1.py \
+                  --input "${generations}" \
+                  --output "${output_dir}/scores_layer1.csv"
+                python score_layer2.py \
+                  --input "${output_dir}/scores_layer1.csv" \
+                  --model "${model_dir}" \
+                  --output "${output_dir}/scores_combined.csv" \
+                  --batch-size 32
+                GENERATIONS="${generations}" OUTPUT_DIR="${output_dir}" \
+                  MODEL_DIR="${model_dir}" python - <<'PY' | tee -a "${manifest}"
+              import csv
+              import hashlib
+              import json
+              import os
+              from collections import Counter
+              from pathlib import Path
+
+              generation_path = Path(os.environ["GENERATIONS"])
+              output_dir = Path(os.environ["OUTPUT_DIR"])
+              model_dir = Path(os.environ["MODEL_DIR"])
+              score_path = output_dir / "scores_combined.csv"
+              rows = list(csv.DictReader(score_path.open(encoding="utf-8-sig")))
+              if not rows:
+                  raise SystemExit(f"No scored rows in {score_path}")
+              if len(rows) != sum(1 for _ in csv.DictReader(
+                      generation_path.open(encoding="utf-8-sig"))):
+                  raise SystemExit(f"Row-count mismatch for {generation_path}")
+              deferred = sum(r["layer1_decision"] == "defer" for r in rows)
+              scored = sum(bool(r["layer2_hallucination_probability"]) for r in rows)
+              if deferred != scored:
+                  raise SystemExit(f"Layer 2 coverage mismatch: {deferred=} {scored=}")
+              metadata_path = model_dir / "judge_metadata.json"
+              weights_path = model_dir / "model.safetensors"
+              summary = {
+                  "generations": str(generation_path),
+                  "rows": len(rows),
+                  "rows_by_variety": dict(Counter(r["variety"] for r in rows)),
+                  "decisions": dict(Counter(r["combined_decision"] for r in rows)),
+                  "score_commit": os.environ["WAHM_GIT_COMMIT"],
+                  "judge_run": os.environ["WAHM_JUDGE_RUN"],
+                  "judge_metadata_sha256": hashlib.sha256(
+                      metadata_path.read_bytes()).hexdigest(),
+                  "judge_weights_sha256": hashlib.sha256(
+                      weights_path.read_bytes()).hexdigest(),
+                  "scores_sha256": hashlib.sha256(score_path.read_bytes()).hexdigest(),
+              }
+              (output_dir / "run_summary.json").write_text(
+                  json.dumps(summary, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+              print(json.dumps(summary, sort_keys=True))
+              PY
+              done
+              echo "Scored ${#generation_files[@]} generation files" > /dev/termination-log
+          env:
+            - name: WAHM_GIT_REPOSITORY
+              value: https://github.com/cyberuniversal/Wahm.git
+            - name: WAHM_GIT_COMMIT
+              value: __WAHM_GIT_COMMIT__
+            - name: WAHM_JUDGE_RUN
+              value: __WAHM_JUDGE_RUN__
+            - name: TOKENIZERS_PARALLELISM
+              value: "false"
+            - name: WANDB_DISABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: "2"
+              memory: 8Gi
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "2"
+              memory: 8Gi
+              nvidia.com/gpu: "1"
+          volumeMounts:
+            - name: results
+              mountPath: /results
+            - name: judge
+              mountPath: /judge
+              readOnly: true
+      volumes:
+        - name: results
+          persistentVolumeClaim:
+            claimName: wahm-allam-539948
+        - name: judge
+          persistentVolumeClaim:
+            claimName: wahm-judge-539948
+            readOnly: true
