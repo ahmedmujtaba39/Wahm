@@ -9,6 +9,7 @@ from pathlib import Path
 import finalize
 import generate
 import analyze_results
+import evaluate_judge_audit
 import evaluate_layer3
 import judge_data
 import prepare_layer3
@@ -477,6 +478,15 @@ class LayerThreeTests(unittest.TestCase):
         self.assertEqual({prepare_judge_audit.audit_route(row) for row in selected},
                          {"layer1_degeneration", "layer2_clean",
                           "layer2_hallucination"})
+
+    def test_judge_v2_audit_metrics_keep_degeneration_separate(self):
+        truth = ["clean", "factual_hallucination", "degeneration"]
+        predicted = ["clean", "degeneration", "degeneration"]
+        metrics = evaluate_judge_audit._metrics(truth, predicted)
+        self.assertEqual(metrics["accuracy"], 0.666667)
+        self.assertEqual(
+            metrics["confusion"]["factual_hallucination"]["degeneration"], 1)
+        self.assertEqual(metrics["per_class"]["degeneration"]["recall"], 1.0)
 
 
 if __name__ == "__main__":
