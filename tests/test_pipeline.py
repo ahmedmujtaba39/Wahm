@@ -16,8 +16,10 @@ import prepare_layer3
 import prepare_judge_audit
 import score_layer1
 import score_layer2
+import select_judge_variant
 import translate
-from train_judge import _model_load_kwargs
+from train_judge import (_model_load_kwargs, _per_tag_recall,
+                         _tokenize_batch)
 from train_layer2_variants import stratified_row_split
 from judge_data import (grouped_split, grouped_train_validation_test_split,
                         load_judge_rows)
@@ -52,11 +54,16 @@ class LayerOneTests(unittest.TestCase):
         _, decision, _ = score_layer1.score_answer("لا أعرف", "بطولتين")
         self.assertEqual(decision, "defer")
 
-    def test_degeneration_overrides_clean_coverage(self):
+    def test_stray_foreign_fragment_does_not_override_factual_routing(self):
         _, decision, reasons = score_layer1.score_answer(
             "بطولتين 中文", "بطولتين")
+        self.assertEqual((decision, reasons), ("defer", []))
+
+    def test_heavy_foreign_script_is_degeneration(self):
+        _, decision, reasons = score_layer1.score_answer(
+            "هذا جواب 中文中文中文中文中文", "جواب")
         self.assertEqual(decision, "degeneration")
-        self.assertIn("foreign_script", reasons)
+        self.assertIn("foreign_script_heavy", reasons)
 
     def test_known_normalization_edge_cases_never_receive_factual_labels(self):
         for answer, gold in (("تفليس", "تبليسي"),
@@ -104,6 +111,79 @@ class LayerTwoRoutingTests(unittest.TestCase):
     def test_unexpected_layer1_route_is_rejected(self):
         with self.assertRaises(ValueError):
             score_layer2.final_decision("clean", None, 0.6)
+
+    def test_threshold_override_requires_explicit_acknowledgement(self):
+        metadata = {"decision_threshold": 0.235}
+        self.assertEqual(score_layer2.resolve_threshold(metadata), 0.235)
+        with self.assertRaises(ValueError):
+            score_layer2.resolve_threshold(metadata, 0.5)
+        self.assertEqual(
+            score_layer2.resolve_threshold(metadata, 0.5, True), 0.5)
+
+
+class JudgeInputAblationTests(unittest.TestCase):
+    class RecordingTokenizer:
+        def __init__(self):
+            self.calls = []
+
+        def __call__(self, *args, **kwargs):
+            self.calls.append((args, kwargs))
+            return {"input_ids": [[1]] for _ in args[0]}
+
+    def test_question_gold_answer_formats_both_segments(self):
+        tokenizer = self.RecordingTokenizer()
+        _tokenize_batch(tokenizer, {
+            "question": ["متى تأسست؟"],
+            "gold": ["1878"],
+            "answer": ["سنة 1878"],
+        }, "question_gold_answer")
+        args, _ = tokenizer.calls[0]
+        self.assertEqual(args[0], ["السؤال: متى تأسست؟\nالإجابة المرجعية: 1878"])
+        self.assertEqual(args[1], ["الإجابة المرشحة: سنة 1878"])
+
+    def test_question_variant_rejects_missing_question(self):
+        with self.assertRaises(ValueError):
+            _tokenize_batch(self.RecordingTokenizer(), {
+                "question": [""], "gold": ["g"], "answer": ["a"],
+            }, "question_gold_answer")
+
+    def test_per_tag_recall_reports_overlapping_binary_tags(self):
+        rows = [{column: "0" for column in judge_data.LABEL_COLUMNS}
+                for _ in range(2)]
+        rows[0]["Named-Entity Hallucination"] = "1"
+        rows[0]["Factual Contradiction"] = "1"
+        rows[1]["Named-Entity Hallucination"] = "1"
+        metrics = _per_tag_recall(rows, [0, 1], [0.9, 0.1], 0.5)
+        self.assertEqual(metrics["Named-Entity Hallucination"],
+                         {"n": 2, "recall": 0.5})
+        self.assertEqual(metrics["Factual Contradiction"],
+                         {"n": 1, "recall": 1.0})
+
+    def test_variant_selection_uses_validation_roc_auc(self):
+        def metadata(variant, roc_auc, f1):
+            return {"input_variant": variant, "test_metrics": None,
+                    "validation_metrics": {"roc_auc": roc_auc, "f1": f1}}
+
+        variants = {
+            "answer_only": metadata("answer_only", 0.8, 0.9),
+            "gold_answer": metadata("gold_answer", 0.85, 0.8),
+            "question_gold_answer": metadata(
+                "question_gold_answer", 0.9, 0.7),
+        }
+        winner, ranking = select_judge_variant.select(variants)
+        self.assertEqual(winner, "question_gold_answer")
+        self.assertEqual(ranking[0], winner)
+
+    def test_variant_selection_rejects_exposed_test_metrics(self):
+        variants = {
+            variant: {"input_variant": variant, "test_metrics": None,
+                      "validation_metrics": {"roc_auc": 0.8, "f1": 0.8}}
+            for variant in ("answer_only", "gold_answer",
+                            "question_gold_answer")
+        }
+        variants["answer_only"]["test_metrics"] = {"f1": 1.0}
+        with self.assertRaises(ValueError):
+            select_judge_variant.select(variants)
 
 
 class TranslationTests(unittest.TestCase):

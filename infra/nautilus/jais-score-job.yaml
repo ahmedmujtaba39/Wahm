@@ -51,7 +51,6 @@ spec:
                 --input "${run_dir}/scores_layer1.csv" \
                 --model "${model_dir}" \
                 --output "${run_dir}/scores_combined.csv" \
-                --threshold "${WAHM_LAYER2_THRESHOLD}" \
                 --batch-size 32
               python - <<'PY' | tee /dev/termination-log
               import csv, hashlib, json, os

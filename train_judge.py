@@ -6,7 +6,11 @@ import hashlib
 import json
 from pathlib import Path
 
-from judge_data import grouped_train_validation_test_split, load_judge_rows
+from judge_data import (LABEL_COLUMNS, grouped_train_validation_test_split,
+                        load_judge_rows)
+
+
+INPUT_VARIANTS = ("answer_only", "gold_answer", "question_gold_answer")
 
 
 def _model_load_kwargs(model_name, model_revision):
@@ -31,11 +35,42 @@ def _metrics_at_threshold(labels, probabilities, threshold, metrics):
             labels, predictions, zero_division=0)), 6),
         "f1": round(float(metrics["f1"](labels, predictions)), 6),
         "roc_auc": round(float(metrics["roc_auc"](labels, probabilities)), 6),
+        "pr_auc": round(float(metrics["pr_auc"](labels, probabilities)), 6),
         "true_negative": int(true_negative),
         "false_positive": int(false_positive),
         "false_negative": int(false_negative),
         "true_positive": int(true_positive),
     }
+
+
+def _per_tag_recall(rows, indices, probabilities, threshold):
+    predictions = [int(probability >= threshold) for probability in probabilities]
+    recalls = {}
+    for tag in LABEL_COLUMNS:
+        tagged = [position for position, index in enumerate(indices)
+                  if rows[index].get(tag, "").strip() == "1"]
+        recalls[tag] = {
+            "n": len(tagged),
+            "recall": (round(sum(predictions[position] for position in tagged) /
+                             len(tagged), 6) if tagged else None),
+        }
+    return recalls
+
+
+def _tokenize_batch(tokenizer, batch, input_variant):
+    if input_variant == "answer_only":
+        return tokenizer(batch["answer"], truncation=True, max_length=512)
+    if input_variant == "gold_answer":
+        return tokenizer(batch["gold"], batch["answer"],
+                         truncation=True, max_length=512)
+    if input_variant == "question_gold_answer":
+        if any(not question.strip() for question in batch["question"]):
+            raise ValueError("question_gold_answer requires a non-empty question")
+        context = [f"السؤال: {question}\nالإجابة المرجعية: {gold}"
+                   for question, gold in zip(batch["question"], batch["gold"])]
+        candidates = [f"الإجابة المرشحة: {answer}" for answer in batch["answer"]]
+        return tokenizer(context, candidates, truncation=True, max_length=512)
+    raise ValueError(f"unsupported input variant: {input_variant!r}")
 
 
 def _select_threshold(labels, probabilities, np, f1_score):
@@ -48,20 +83,23 @@ def _select_threshold(labels, probabilities, np, f1_score):
 
 
 def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
-        use_gold=True, batch_size=2, gradient_accumulation=8,
+        input_variant="gold_answer", batch_size=2, gradient_accumulation=8,
         model_name="aubmindlab/bert-base-arabertv2", model_revision=None,
-        smoke_groups=None, model_source_id=None):
+        smoke_groups=None, model_source_id=None, evaluate_test=True):
     import datasets
     import numpy as np
     import torch
     import transformers
     from datasets import Dataset
-    from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
-                                 precision_score, recall_score, roc_auc_score)
+    from sklearn.metrics import (accuracy_score, average_precision_score,
+                                 confusion_matrix, f1_score, precision_score,
+                                 recall_score, roc_auc_score)
     from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                               DataCollatorWithPadding, Trainer, TrainingArguments)
 
     rows = load_judge_rows(data_path)
+    if input_variant not in INPUT_VARIANTS:
+        raise ValueError(f"input_variant must be one of {INPUT_VARIANTS}")
     train_indices, validation_indices, test_indices = \
         grouped_train_validation_test_split(
             rows, test_fold=test_fold, validation_fold=validation_fold)
@@ -86,15 +124,13 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         data = {
             "answer": [rows[i]["answer"] for i in indices],
             "gold": [rows[i]["gold_answer"] for i in indices],
+            "question": [rows[i].get("question", "") for i in indices],
             "label": [rows[i]["label"] for i in indices],
         }
         dataset = Dataset.from_dict(data)
 
         def tokenize(batch):
-            if use_gold:
-                return tokenizer(batch["gold"], batch["answer"],
-                                 truncation=True, max_length=512)
-            return tokenizer(batch["answer"], truncation=True, max_length=512)
+            return _tokenize_batch(tokenizer, batch, input_variant)
         return dataset.map(tokenize, batched=True)
 
     train_dataset = make_dataset(train_indices)
@@ -109,7 +145,8 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
             output.label_ids, probabilities, 0.5,
             {"accuracy": accuracy_score, "f1": f1_score,
              "precision": precision_score, "recall": recall_score,
-             "roc_auc": roc_auc_score, "confusion": confusion_matrix})
+             "roc_auc": roc_auc_score, "pr_auc": average_precision_score,
+             "confusion": confusion_matrix})
 
     output_path = Path(output_dir)
     arguments = TrainingArguments(
@@ -143,11 +180,13 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
     validation_probabilities = _probabilities(validation_output.predictions, np)
     threshold = _select_threshold(
         validation_output.label_ids, validation_probabilities, np, f1_score)
-    test_output = trainer.predict(test_dataset)
-    test_probabilities = _probabilities(test_output.predictions, np)
+    test_output = trainer.predict(test_dataset) if evaluate_test else None
+    test_probabilities = (_probabilities(test_output.predictions, np)
+                          if test_output is not None else None)
     metric_functions = {"accuracy": accuracy_score, "f1": f1_score,
                         "precision": precision_score, "recall": recall_score,
                         "roc_auc": roc_auc_score,
+                        "pr_auc": average_precision_score,
                         "confusion": confusion_matrix}
 
     def group_ids(indices):
@@ -160,7 +199,12 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         "base_model_load_path": model_name,
         "base_model_revision": model_revision,
         "smoke_test": smoke_groups is not None,
-        "input": "gold_answer + answer" if use_gold else "answer only",
+        "input_variant": input_variant,
+        "input": {
+            "answer_only": "answer only",
+            "gold_answer": "gold_answer + answer",
+            "question_gold_answer": "question + gold_answer + answer",
+        }[input_variant],
         "data": data_path,
         "data_sha256": hashlib.sha256(data_bytes).hexdigest(),
         "seed": 42,
@@ -198,9 +242,15 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
         "validation_metrics": _metrics_at_threshold(
             validation_output.label_ids, validation_probabilities, threshold,
             metric_functions),
-        "test_metrics": _metrics_at_threshold(
+        "test_metrics": (_metrics_at_threshold(
             test_output.label_ids, test_probabilities, threshold,
-            metric_functions),
+            metric_functions) if test_output is not None else None),
+        "validation_per_tag_recall": _per_tag_recall(
+            rows, validation_indices, validation_probabilities, threshold),
+        "test_per_tag_recall": (_per_tag_recall(
+            rows, test_indices, test_probabilities, threshold)
+            if test_probabilities is not None else None),
+        "test_evaluated_after_variant_selection": None,
         "n_train": len(train_indices),
         "n_validation": len(validation_indices),
         "n_test": len(test_indices),
@@ -240,8 +290,9 @@ def run(data_path, output_dir, test_fold=0, validation_fold=0, epochs=3,
 
     write_predictions("validation_predictions.csv", validation_indices,
                       validation_output.label_ids, validation_probabilities)
-    write_predictions("test_predictions.csv", test_indices,
-                      test_output.label_ids, test_probabilities)
+    if test_output is not None:
+        write_predictions("test_predictions.csv", test_indices,
+                          test_output.label_ids, test_probabilities)
     (output_path / "judge_metadata.json").write_text(
         json.dumps(metadata, indent=2), encoding="utf-8")
     print(json.dumps({"decision_threshold": metadata["decision_threshold"],
@@ -266,9 +317,19 @@ if __name__ == "__main__":
                         help="canonical model ID when --model is a local snapshot")
     parser.add_argument("--smoke-groups", type=int, default=None,
                         help="limit each partition to N question groups for plumbing tests")
-    parser.add_argument("--answer-only", action="store_true")
+    parser.add_argument("--input-variant", choices=INPUT_VARIANTS,
+                        default="gold_answer")
+    parser.add_argument("--answer-only", action="store_true",
+                        help=argparse.SUPPRESS)
+    parser.add_argument("--skip-test-evaluation", action="store_true",
+                        help="reserve the held-out test set during ablations")
     args = parser.parse_args()
+    if args.answer_only:
+        if args.input_variant != "gold_answer":
+            parser.error("--answer-only cannot be combined with --input-variant")
+        args.input_variant = "answer_only"
     run(args.data, args.output, args.test_fold, args.validation_fold,
-        args.epochs, not args.answer_only, args.batch_size,
+        args.epochs, args.input_variant, args.batch_size,
         args.gradient_accumulation, args.model, args.model_revision,
-        args.smoke_groups, args.model_source_id)
+        args.smoke_groups, args.model_source_id,
+        not args.skip_test_evaluation)

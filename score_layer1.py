@@ -62,14 +62,22 @@ def heavy_repetition(text, minimum_repeats=4):
     return False
 
 
+def heavy_foreign_script(text, minimum_characters=3, minimum_density=0.1):
+    """Flag substantial CJK/Hangul contamination, not a stray character."""
+    alphabetic = sum(character.isalpha() for character in text)
+    foreign = len(FOREIGN_GARBAGE.findall(text))
+    return bool(alphabetic and foreign >= minimum_characters and
+                foreign / alphabetic >= minimum_density)
+
+
 def degeneration_reasons(answer, generation_error=""):
     reasons = []
     if generation_error.strip():
         reasons.append("generation_error")
     if not answer.strip():
         reasons.append("empty_answer")
-    if FOREIGN_GARBAGE.search(answer):
-        reasons.append("foreign_script")
+    if heavy_foreign_script(answer):
+        reasons.append("foreign_script_heavy")
     if ROLE_MARKER.search(answer):
         reasons.append("role_marker")
     if CODE_FENCE.search(answer):

@@ -41,7 +41,6 @@ spec:
                 --input "${run_dir}/scores_layer1.csv" \
                 --model "${model_dir}" \
                 --output "${run_dir}/scores_combined.csv" \
-                --threshold 0.5 \
                 --batch-size 32
               python - <<'PY' > /dev/termination-log
               import csv, hashlib, json, os
