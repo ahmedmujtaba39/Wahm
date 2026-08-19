@@ -68,7 +68,7 @@ spec:
                   --input "${output_dir}/scores_layer1.csv" \
                   --model "${model_dir}" \
                   --output "${output_dir}/scores_combined.csv" \
-                  --batch-size 32
+                  --batch-size "${WAHM_BATCH_SIZE}"
                 GENERATIONS="${generations}" OUTPUT_DIR="${output_dir}" \
                   MODEL_DIR="${model_dir}" python - <<'PY' | tee -a "${manifest}"
               import csv
@@ -157,15 +157,17 @@ spec:
               value: "false"
             - name: WANDB_DISABLED
               value: "true"
+            - name: WAHM_BATCH_SIZE
+              value: "64"
+            - name: OMP_NUM_THREADS
+              value: "16"
           resources:
             requests:
-              cpu: "2"
-              memory: 8Gi
-              nvidia.com/gpu: "1"
+              cpu: "16"
+              memory: 16Gi
             limits:
-              cpu: "2"
-              memory: 8Gi
-              nvidia.com/gpu: "1"
+              cpu: "16"
+              memory: 16Gi
           volumeMounts:
             - name: results
               mountPath: /results
