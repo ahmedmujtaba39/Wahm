@@ -9,9 +9,6 @@ metadata:
 spec:
   activeDeadlineSeconds: 604800
   backoffLimit: 3
-  completions: 3
-  parallelism: 3
-  completionMode: Indexed
   podFailurePolicy:
     rules:
       - action: Ignore
@@ -33,8 +30,6 @@ spec:
           args:
             - |
               set -euo pipefail
-              variants=(answer_only gold_answer question_gold_answer)
-              variant="${variants[JOB_COMPLETION_INDEX]}"
               apt-get update
               apt-get install -y --no-install-recommends git ca-certificates
               rm -rf /var/lib/apt/lists/*
@@ -60,21 +55,27 @@ spec:
                   raise SystemExit("CUDA is unavailable inside the training pod")
               print(torch.cuda.get_device_name(0))
               PY
-              output="/workspace/results/wahm-judge-ablation/${WAHM_GIT_COMMIT}/${variant}"
               cd /tmp/wahm
-              python train_judge.py \
-                --data judge_train.csv \
-                --model "${model_snapshot}" \
-                --model-source-id "${WAHM_JUDGE_MODEL}" \
-                --model-revision "${WAHM_JUDGE_REVISION}" \
-                --output "${output}" \
-                --input-variant "${variant}" \
-                --skip-test-evaluation \
-                --test-fold 0 \
-                --validation-fold 0 \
-                --epochs 3 \
-                --batch-size 8 \
-                --gradient-accumulation 2
+              for variant in answer_only gold_answer question_gold_answer; do
+                output="/workspace/results/wahm-judge-ablation/${WAHM_GIT_COMMIT}/${variant}"
+                if [[ -s "${output}/judge_metadata.json" ]]; then
+                  echo "Already complete; skipping ${variant}"
+                  continue
+                fi
+                python train_judge.py \
+                  --data judge_train.csv \
+                  --model "${model_snapshot}" \
+                  --model-source-id "${WAHM_JUDGE_MODEL}" \
+                  --model-revision "${WAHM_JUDGE_REVISION}" \
+                  --output "${output}" \
+                  --input-variant "${variant}" \
+                  --skip-test-evaluation \
+                  --test-fold 0 \
+                  --validation-fold 0 \
+                  --epochs 3 \
+                  --batch-size 8 \
+                  --gradient-accumulation 2
+              done
           env:
             - name: WAHM_GIT_COMMIT
               value: __WAHM_GIT_COMMIT__
