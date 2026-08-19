@@ -27,13 +27,16 @@ spec:
               mkdir -p "$(dirname "${log}")"
               exec > >(tee -a "${log}") 2>&1
               apt-get update
-              apt-get install -y --no-install-recommends git ca-certificates
+              apt-get install -y --no-install-recommends git ca-certificates curl
               rm -rf /var/lib/apt/lists/*
               git clone "${WAHM_GIT_REPOSITORY}" /tmp/wahm
               git -C /tmp/wahm checkout --detach "${WAHM_GIT_COMMIT}"
               python -m pip install --no-cache-dir -r /tmp/wahm/requirements-judge.txt
 
-              model_dir="/judge/${WAHM_JUDGE_MODEL_PATH}"
+              model_dir="/tmp/wahm/${WAHM_JUDGE_MODEL_PATH}"
+              curl --fail --location --retry 5 \
+                --output "${model_dir}/model.safetensors" \
+                "${WAHM_JUDGE_MODEL_URL}"
               test -s "${model_dir}/model.safetensors"
               test -s "${model_dir}/judge_metadata.json"
               cd /tmp/wahm
@@ -148,6 +151,8 @@ spec:
               value: __WAHM_JUDGE_RUN__
             - name: WAHM_JUDGE_MODEL_PATH
               value: __WAHM_JUDGE_MODEL_PATH__
+            - name: WAHM_JUDGE_MODEL_URL
+              value: __WAHM_JUDGE_MODEL_URL__
             - name: TOKENIZERS_PARALLELISM
               value: "false"
             - name: WANDB_DISABLED
@@ -164,14 +169,7 @@ spec:
           volumeMounts:
             - name: results
               mountPath: /results
-            - name: judge
-              mountPath: /judge
-              readOnly: true
       volumes:
         - name: results
           persistentVolumeClaim:
             claimName: wahm-allam-539948
-        - name: judge
-          persistentVolumeClaim:
-            claimName: wahm-judge-539948
-            readOnly: true
