@@ -122,11 +122,11 @@ spec:
             requests:
               cpu: "4"
               memory: 16Gi
-              nvidia.com/a100: "1"
+              nvidia.com/gpu: "1"
             limits:
               cpu: "4"
               memory: 16Gi
-              nvidia.com/a100: "1"
+              nvidia.com/gpu: "1"
           volumeMounts:
             - name: workspace
               mountPath: /workspace
